@@ -28,6 +28,8 @@
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.client.model.*" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.client.model.Error" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="org.apache.commons.collections.map.HashedMap" %>
 <jsp:directive.include file="localize.jsp"/>
 
 <%
