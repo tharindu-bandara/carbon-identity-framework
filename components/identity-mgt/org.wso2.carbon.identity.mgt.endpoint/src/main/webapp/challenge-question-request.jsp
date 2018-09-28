@@ -44,9 +44,13 @@
             User user = IdentityManagementServiceUtil.getInstance().getUser(username);
 
             try {
+                Map<String, String> requestHeaders = new HashedMap();
+                if(request.getParameter("g-recaptcha-response") != null) {
+                    requestHeaders.put("g-recaptcha-response", request.getParameter("g-recaptcha-response"));
+                }
                 SecurityQuestionApi securityQuestionApi = new SecurityQuestionApi();
-                InitiateAllQuestionResponse initiateAllQuestionResponse = securityQuestionApi.securityQuestionsGet(user.getUsername(),
-                        user.getRealm(), user.getTenantDomain());
+                InitiateAllQuestionResponse initiateAllQuestionResponse = securityQuestionApi.securityQuestionsGet(
+                        user.getUsername(), user.getRealm(), user.getTenantDomain(), requestHeaders);
                 IdentityManagementEndpointUtil.addReCaptchaHeaders(request, securityQuestionApi.getApiClient().getResponseHeaders());
                 session.setAttribute("initiateAllQuestionResponse", initiateAllQuestionResponse);
 

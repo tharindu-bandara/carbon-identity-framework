@@ -47,9 +47,13 @@
         session.setAttribute(IdentityManagementEndpointConstants.TENANT_DOMAIN, user.getTenantDomain());
 
         try {
+            Map<String, String> requestHeaders = new HashedMap();
+            if(request.getParameter("g-recaptcha-response") != null) {
+                requestHeaders.put("g-recaptcha-response", request.getParameter("g-recaptcha-response"));
+            }
             SecurityQuestionApi securityQuestionApi = new SecurityQuestionApi();
-            InitiateQuestionResponse initiateQuestionResponse =
-                    securityQuestionApi.securityQuestionGet(user.getUsername(), user.getRealm(), user.getTenantDomain());
+            InitiateQuestionResponse initiateQuestionResponse = securityQuestionApi.securityQuestionGet(
+                    user.getUsername(), user.getRealm(), user.getTenantDomain(), requestHeaders);
             IdentityManagementEndpointUtil.addReCaptchaHeaders(request, securityQuestionApi.getApiClient().getResponseHeaders());
             session.setAttribute("initiateChallengeQuestionResponse", initiateQuestionResponse);
             request.getRequestDispatcher("/viewsecurityquestions.do").forward(request, response);
