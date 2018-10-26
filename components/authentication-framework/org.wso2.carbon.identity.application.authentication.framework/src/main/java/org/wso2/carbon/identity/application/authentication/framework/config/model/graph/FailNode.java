@@ -55,7 +55,7 @@ public class FailNode implements AuthGraphNode {
     }
 
     @Override
-    public AuthGraphNode gerParent() {
+    public AuthGraphNode getParent() {
         return null;
     }
 
