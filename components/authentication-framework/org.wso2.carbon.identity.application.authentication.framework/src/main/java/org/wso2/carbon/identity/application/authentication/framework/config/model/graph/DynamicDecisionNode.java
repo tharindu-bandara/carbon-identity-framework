@@ -40,7 +40,7 @@ public class DynamicDecisionNode implements AuthGraphNode {
     }
 
     @Override
-    public AuthGraphNode gerParent() {
+    public AuthGraphNode getParent() {
         return parentNode;
     }
 

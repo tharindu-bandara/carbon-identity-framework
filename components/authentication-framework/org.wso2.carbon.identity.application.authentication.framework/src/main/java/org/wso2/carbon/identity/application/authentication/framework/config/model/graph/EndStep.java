@@ -32,7 +32,7 @@ public class EndStep implements AuthGraphNode {
     }
 
     @Override
-    public AuthGraphNode gerParent() {
+    public AuthGraphNode getParent() {
         return parentNode;
     }
 

@@ -55,7 +55,7 @@ public class StepConfigGraphNode extends StepConfig implements AuthGraphNode {
     }
 
     @Override
-    public AuthGraphNode gerParent() {
+    public AuthGraphNode getParent() {
         return parentNode;
     }
 
