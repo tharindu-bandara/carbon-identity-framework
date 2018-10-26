@@ -420,7 +420,7 @@ public class GraphBasedSequenceHandler extends DefaultStepBasedSequenceHandler i
         if (flowStatus == FAIL_COMPLETED) {
             if (stepConfigGraphNode.getNext() instanceof EndStep) {
                 if (context.isRetrying()) {
-                    AuthGraphNode nextNode = stepConfigGraphNode.getParent();
+                    AuthGraphNode nextNode = stepConfigGraphNode.gerParent();
                     if (nextNode == null) {
                         nextNode = sequenceConfig.getAuthenticationGraph().getStartNode();
                     }
@@ -568,7 +568,7 @@ public class GraphBasedSequenceHandler extends DefaultStepBasedSequenceHandler i
                         executeFunction("onFail", dynamicDecisionNode, context);
                     } else {
                         if (context.isRetrying()) {
-                            AuthGraphNode nextNode = dynamicDecisionNode.getParent();
+                            AuthGraphNode nextNode = dynamicDecisionNode.gerParent();
                             context.setProperty(FrameworkConstants.JSAttributes.PROP_CURRENT_NODE, nextNode);
                             return;
                         }
