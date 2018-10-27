@@ -24,9 +24,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.identity.application.authentication.framework.AuthenticationDataPublisher;
+import org.wso2.carbon.identity.application.authentication.framework.AuthenticationFlowHandler;
 import org.wso2.carbon.identity.application.authentication.framework.cache.AuthenticationRequestCacheEntry;
 import org.wso2.carbon.identity.application.authentication.framework.config.model.ApplicationConfig;
+import org.wso2.carbon.identity.application.authentication.framework.config.model.AuthenticatorConfig;
 import org.wso2.carbon.identity.application.authentication.framework.config.model.SequenceConfig;
+import org.wso2.carbon.identity.application.authentication.framework.config.model.StepConfig;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 import org.wso2.carbon.identity.application.authentication.framework.context.SessionContext;
 import org.wso2.carbon.identity.application.authentication.framework.context.TransientObjectWrapper;
@@ -40,6 +43,7 @@ import org.wso2.carbon.identity.application.authentication.framework.internal.Fr
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
+import org.wso2.carbon.identity.application.authentication.framework.util.LoginContextManagementUtil;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.registry.core.utils.UUIDGenerator;
@@ -51,6 +55,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,9 +64,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.BACK_TO_PREVIOUS_STEP;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.REQUEST_PARAM_SP;
-import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.RequestParams
-        .TENANT_DOMAIN;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.RequestParams.AUTH_TYPE;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.RequestParams.IDENTIFIER_CONSENT;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.RequestParams.IDF;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.RequestParams.TENANT_DOMAIN;
 
 /**
  * Request Coordinator
@@ -101,6 +109,7 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         AuthenticationContext context = null;
+
         try {
             AuthenticationRequestCacheEntry authRequest = null;
             String sessionDataKey = request.getParameter("sessionDataKey");
@@ -150,6 +159,16 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
             }
 
             if (context != null) {
+
+                if (isIdentifierFirstRequest(request)) {
+                    StepConfig stepConfig = context.getSequenceConfig().getStepMap().get(context.getCurrentStep());
+                    boolean isIDFAuthenticatorInCurrentStep = isIDFAuthenticatorFoundInStep(stepConfig);
+                    //Current step cannot handle the IDF request. This is probably user has clicked on the back button.
+                    if (!isIDFAuthenticatorInCurrentStep) {
+                        handleIdentifierRequestInPreviousSteps(context);
+                    }
+                }
+
                 setSPAttributeToRequest(request, context);
                 context.setReturning(returning);
 
@@ -197,6 +216,75 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
             log.error("Exception in Authentication Framework", e);
             FrameworkUtils.sendToRetryPage(request, response);
         }
+    }
+
+
+    private void handleIdentifierRequestInPreviousSteps(AuthenticationContext context) {
+
+        boolean isIDFAuthenticatorFound = false;
+        int currentStep = context.getCurrentStep();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Started to handle the IDF request as previous steps since the current steps cannot handle the" +
+                    " IDF request");
+        }
+        while (currentStep > 1 && !isIDFAuthenticatorFound) {
+            currentStep = currentStep - 1;
+            isIDFAuthenticatorFound = isIDFAuthenticatorFoundInStep(context.getSequenceConfig().getStepMap().get(currentStep));
+        }
+
+        if (isIDFAuthenticatorFound) {
+            context.setCurrentStep(currentStep);
+            context.setProperty(BACK_TO_PREVIOUS_STEP, true);
+            //IDF should be the first step.
+            context.getCurrentAuthenticatedIdPs().clear();
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("IDF requests cannot handle in any of the previous steps.");
+            }
+        }
+    }
+
+    private boolean isIDFAuthenticatorFoundInStep( StepConfig stepConfig) {
+
+        boolean isIDFAuthenticatorInCurrentStep = false;
+        if (stepConfig != null) {
+            List<AuthenticatorConfig> authenticatorList = stepConfig.getAuthenticatorList();
+            for (AuthenticatorConfig config : authenticatorList) {
+                if (config.getApplicationAuthenticator() instanceof AuthenticationFlowHandler) {
+                    isIDFAuthenticatorInCurrentStep = true;
+                }
+            }
+        }
+        return isIDFAuthenticatorInCurrentStep;
+    }
+
+    /**
+     * This method is used to identify the Identifier First requests.
+     * @param request HttpServletRequest
+     * @return true or false.
+     */
+    private boolean isIdentifierFirstRequest(HttpServletRequest request) {
+
+        String authType = request.getParameter(AUTH_TYPE);
+        return IDF.equals(authType) || request.getParameter(IDENTIFIER_CONSENT) != null;
+    }
+
+    /**
+     * Print the request headers as a one string with header names and respective values.
+     * @param request HTTP request to retrieve headers.
+     * @return Headers and values as a single string.
+     */
+    private String getHeaderString(HttpServletRequest request) {
+
+        Enumeration<String> headerNames = request.getHeaderNames();
+        StringBuilder stringBuilder = new StringBuilder();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            stringBuilder.append("Header Name: ").append(headerName).append(", ")
+                    .append("Value: ").append(request.getHeader(headerName)).append(". ");
+        }
+        return stringBuilder.toString();
     }
 
     /**
