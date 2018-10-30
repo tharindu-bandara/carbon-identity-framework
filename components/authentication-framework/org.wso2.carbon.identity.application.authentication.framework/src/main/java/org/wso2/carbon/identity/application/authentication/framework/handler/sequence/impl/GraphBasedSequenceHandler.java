@@ -418,21 +418,23 @@ public class GraphBasedSequenceHandler extends DefaultStepBasedSequenceHandler i
         }
 
         if (flowStatus == FAIL_COMPLETED) {
-            if (context.isRetrying()) {
-                StepConfigGraphNode newNextNode = new StepConfigGraphNode(stepConfigGraphNode.getStepConfig());
-                newNextNode.setNext(stepConfigGraphNode.getNext());
-                AuthGraphNode parentNode = stepConfigGraphNode.getParent();
-                if (parentNode == null) {
-                    parentNode = sequenceConfig.getAuthenticationGraph().getStartNode();
+            if (!(stepConfigGraphNode.getNext() instanceof DynamicDecisionNode)) {
+                if (context.isRetrying()) {
+                    StepConfigGraphNode newNextNode = new StepConfigGraphNode(stepConfigGraphNode.getStepConfig());
+                    newNextNode.setNext(stepConfigGraphNode.getNext());
+                    AuthGraphNode parentNode = stepConfigGraphNode.getParent();
+                    if (parentNode == null) {
+                        parentNode = sequenceConfig.getAuthenticationGraph().getStartNode();
+                    }
+                    if (parentNode instanceof DynamicDecisionNode) {
+                        ((DynamicDecisionNode) parentNode).setDefaultEdge(newNextNode);
+                    } else if (parentNode instanceof StepConfigGraphNode) {
+                        ((StepConfigGraphNode) parentNode).setNext(newNextNode);
+                    }
+                    stepConfigGraphNode.setNext(newNextNode);
+                } else {
+                    stepConfigGraphNode.setNext(new FailNode());
                 }
-                if (parentNode instanceof DynamicDecisionNode) {
-                    ((DynamicDecisionNode) parentNode).setDefaultEdge(newNextNode);
-                } else if (parentNode instanceof StepConfigGraphNode) {
-                    ((StepConfigGraphNode) parentNode).setNext(newNextNode);
-                }
-                stepConfigGraphNode.setNext(newNextNode);
-            } else {
-                stepConfigGraphNode.setNext(new FailNode());
             }
         }
         // if step is not completed, that means step wants to redirect to outside
