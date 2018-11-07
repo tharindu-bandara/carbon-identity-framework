@@ -89,13 +89,17 @@ public class FileBasedConfigurationBuilder {
     private List<ExternalIdPConfig> idpList = new ArrayList<>();
     private List<SequenceConfig> sequenceList = new ArrayList<>();
     private List<String> authEndpointQueryParams = new ArrayList<>();
+    private List<String> authEndpointRedirectParams = new ArrayList<>();
     private Map<String, AuthenticatorConfig> authenticatorConfigMap = new HashMap<>();
     private Map<String, Object> extensions = new HashMap<>();
     private int maxLoginAttemptCount = 5;
     private Map<String, String> authenticatorNameMappings = new HashMap<>();
     private Map<String, Integer> cacheTimeouts = new HashMap<>();
     private String authEndpointQueryParamsAction;
+    private String authEndpointRedirectParamsAction;
     private boolean authEndpointQueryParamsConfigAvailable;
+    private boolean authEndpointRedirectParamsConfigAvailable;
+    private boolean removeAPIParametersOnConsume;
 
     public static FileBasedConfigurationBuilder getInstance() {
         if (instance == null) {
@@ -187,6 +191,9 @@ public class FileBasedConfigurationBuilder {
 
             // ########### Read Authentication Endpoint Query Params ###########
             readAuthenticationEndpointQueryParams(rootElement);
+
+            // ########### Read Authentication Endpoint Redirect Filter Params ###########
+            readAuthenticationEndpointRedirectParams(rootElement);
 
             //########### Read Extension Points ###########
             readExtensionPoints(rootElement);
@@ -425,6 +432,46 @@ public class FileBasedConfigurationBuilder {
 
                 if (queryParamName != null) {
                     this.authEndpointQueryParams.add(queryParamName);
+                }
+            }
+        }
+    }
+
+    private void readAuthenticationEndpointRedirectParams(OMElement documentElement) {
+        OMElement authEndpointRedirectParamsElem = documentElement.getFirstChildWithName(
+                IdentityApplicationManagementUtil.getQNameWithIdentityApplicationNS(
+                        FrameworkConstants.Config.QNAME_AUTH_ENDPOINT_REDIRECT_PARAMS));
+
+        if (authEndpointRedirectParamsElem != null) {
+
+            authEndpointRedirectParamsConfigAvailable = true;
+            OMAttribute actionAttr = authEndpointRedirectParamsElem.getAttribute(new QName(
+                    FrameworkConstants.Config.ATTR_AUTH_ENDPOINT_QUERY_PARAM_ACTION));
+            OMAttribute removeOnConsumeAttr = authEndpointRedirectParamsElem.getAttribute(new QName(
+                    FrameworkConstants.Config.REMOVE_PARAM_ON_CONSUME));
+            authEndpointRedirectParamsAction = FrameworkConstants.AUTH_ENDPOINT_QUERY_PARAMS_ACTION_EXCLUDE;
+
+            if (actionAttr != null) {
+                String actionValue = actionAttr.getAttributeValue();
+
+                if (actionValue != null && !actionValue.isEmpty()) {
+                    authEndpointRedirectParamsAction = actionValue;
+                }
+            }
+
+            if (removeOnConsumeAttr != null) {
+                removeAPIParametersOnConsume = Boolean.parseBoolean(removeOnConsumeAttr.getAttributeValue());
+            }
+
+
+            for (Iterator authEndpointRedirectParamElems = authEndpointRedirectParamsElem
+                    .getChildrenWithLocalName(FrameworkConstants.Config.ELEM_AUTH_ENDPOINT_REDIRECT_PARAM);
+                 authEndpointRedirectParamElems.hasNext(); ) {
+                String redirectParamName = processAuthEndpointQueryParamElem((OMElement) authEndpointRedirectParamElems
+                        .next());
+
+                if (redirectParamName != null) {
+                    this.authEndpointRedirectParams.add(redirectParamName);
                 }
             }
         }
@@ -861,12 +908,25 @@ public class FileBasedConfigurationBuilder {
         return authEndpointQueryParams;
     }
 
+    public List<String> getAuthEndpointRedirectParams() {
+        return authEndpointRedirectParams;
+    }
+
     public String getAuthEndpointQueryParamsAction() {
         return authEndpointQueryParamsAction;
     }
 
+
+    public String getAuthEndpointRedirectParamsAction() {
+        return authEndpointRedirectParamsAction;
+    }
+
     public boolean isAuthEndpointQueryParamsConfigAvailable() {
         return authEndpointQueryParamsConfigAvailable;
+    }
+
+    public boolean isAuthEndpointRedirectParamsConfigAvailable() {
+        return authEndpointRedirectParamsConfigAvailable;
     }
 
     public String getAuthenticationEndpointURL() {
@@ -969,5 +1029,10 @@ public class FileBasedConfigurationBuilder {
         }
 
         return false;
+    }
+
+    public boolean isRemoveAPIParametersOnConsume() {
+
+        return removeAPIParametersOnConsume;
     }
 }
