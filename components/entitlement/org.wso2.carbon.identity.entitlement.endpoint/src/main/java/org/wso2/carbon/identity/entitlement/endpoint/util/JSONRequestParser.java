@@ -258,10 +258,9 @@ public class JSONRequestParser {
                     JsonArray valueArray = property.getValue().getAsJsonArray();
                     for (JsonElement value : valueArray) {
                         if (value.isJsonPrimitive()) {
-                            //check if each value's data type can be determined
-                            URI dataType = stringAttributeToURI(
-                                    jsonElementToDataType(property.getValue().getAsJsonPrimitive()));
-                            attributeValues.add(getAttributeValue(property.getValue().getAsString(), dataType, type));
+                            // Check if each value's data type can be determined and and supports array of attribute values.
+                            URI dataType = stringAttributeToURI(jsonElementToDataType(value.getAsJsonPrimitive()));
+                            attributeValues.add(getAttributeValue(value.getAsString(), dataType, type));
                         }
                     }
                 }
