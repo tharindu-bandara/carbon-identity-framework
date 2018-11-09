@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.application.authentication.framework.handler.req
 import org.wso2.carbon.identity.application.authentication.framework.internal.FrameworkServiceComponent;
 import org.wso2.carbon.identity.application.authentication.framework.internal.FrameworkServiceDataHolder;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
+import org.wso2.carbon.identity.application.authentication.framework.model.CommonAuthResponseWrapper;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
 import org.wso2.carbon.identity.application.authentication.framework.util.LoginContextManagementUtil;
@@ -108,12 +109,18 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        boolean responseWrapped = false;
+        CommonAuthResponseWrapper responseWrapper = null;
+        if (response instanceof CommonAuthResponseWrapper) {
+            responseWrapper = (CommonAuthResponseWrapper) response;
+        } else {
+            responseWrapper = new CommonAuthResponseWrapper(response);
+            responseWrapped = true;
+        }
         AuthenticationContext context = null;
-
+        String sessionDataKey = request.getParameter("sessionDataKey");
         try {
             AuthenticationRequestCacheEntry authRequest = null;
-            String sessionDataKey = request.getParameter("sessionDataKey");
-
             boolean returning = false;
             // Check whether this is the start of the authentication flow.
             // 'type' parameter should be present if so. This parameter contains
@@ -142,7 +149,7 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
                         if (log.isDebugEnabled()) {
                             log.debug("Session data key is null in the request and not a logout request.");
                         }
-                        FrameworkUtils.sendToRetryPage(request, response);
+                        FrameworkUtils.sendToRetryPage(request, responseWrapper);
                     }
                 }
 
@@ -151,11 +158,11 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
                     request = FrameworkUtils.getCommonAuthReqWithParams(request, authRequest);
                     FrameworkUtils.removeAuthenticationRequestFromCache(sessionDataKey);
                 }
-                context = initializeFlow(request, response);
+                context = initializeFlow(request, responseWrapper);
             } else {
                 returning = true;
                 context = FrameworkUtils.getContextData(request);
-                associateTransientRequestData(request, response, context);
+                associateTransientRequestData(request, responseWrapper, context);
             }
 
             if (context != null) {
@@ -178,9 +185,9 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
                 }
 
                 if (!context.isLogoutRequest()) {
-                    FrameworkUtils.getAuthenticationRequestHandler().handle(request, response, context);
+                    FrameworkUtils.getAuthenticationRequestHandler().handle(request, responseWrapper, context);
                 } else {
-                    FrameworkUtils.getLogoutRequestHandler().handle(request, response, context);
+                    FrameworkUtils.getLogoutRequestHandler().handle(request, responseWrapper, context);
                 }
             } else {
                 if (log.isDebugEnabled()) {
@@ -192,8 +199,9 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
                     }
                 }
                 log.error("Context does not exist. Probably due to invalidated cache");
-                FrameworkUtils.sendToRetryPage(request, response);
+                FrameworkUtils.sendToRetryPage(request, responseWrapper);
             }
+            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
         } catch (JsFailureException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Script initiated Exception occured.", e);
@@ -202,19 +210,46 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
             if (log.isDebugEnabled()) {
                 log.debug("User will be redirected to retry page or the error page provided by script.");
             }
+            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
         } catch (MisconfigurationException e) {
             FrameworkUtils.sendToRetryPage(request, response, "misconfiguration.error","something.went.wrong.contact.admin");
+            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
         } catch (PostAuthenticationFailedException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Error occurred while evaluating post authentication", e);
             }
-            FrameworkUtils
-                .removeCookie(request, response, FrameworkUtils.getPASTRCookieName(context.getContextIdentifier()));
+            FrameworkUtils.removeCookie(request, responseWrapper,
+                    FrameworkUtils.getPASTRCookieName(context.getContextIdentifier()));
             publishAuthenticationFailure(request, context, context.getSequenceConfig().getAuthenticatedUser());
             FrameworkUtils.sendToRetryPage(request, response, "Authentication attempt failed.", e.getErrorCode());
+            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
         } catch (Throwable e) {
             log.error("Exception in Authentication Framework", e);
-            FrameworkUtils.sendToRetryPage(request, response);
+            FrameworkUtils.sendToRetryPage(request, responseWrapper);
+            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
+        }
+    }
+
+    protected void unwrapResponse(boolean wrapped, CommonAuthResponseWrapper responseWrapper, String sessionDataKey,
+                                  HttpServletResponse response, AuthenticationContext context) throws IOException {
+
+        if (responseWrapper.isRedirect()) {
+            String redirectURL;
+            if (context != null) {
+                redirectURL = FrameworkUtils.getRedirectURLWithFilteredParams(responseWrapper.getRedirectURL(),
+                        context);
+            } else {
+                log.warn("Authentication context is null, redirect parameter filtering will not be done for " +
+                        sessionDataKey);
+                redirectURL = responseWrapper.getRedirectURL();
+            }
+            if (wrapped) {
+                response.sendRedirect(redirectURL);
+            } else {
+                responseWrapper.sendRedirect(redirectURL);
+            }
+        } else if (wrapped) {
+            responseWrapper.write();
         }
     }
 

@@ -96,11 +96,12 @@ public class FileBasedConfigurationBuilder {
     private Map<String, Integer> cacheTimeouts = new HashMap<>();
     private String authEndpointQueryParamsAction;
     private boolean authEndpointQueryParamsConfigAvailable;
+    private boolean removeAPIParametersOnConsume;
 
     public static FileBasedConfigurationBuilder getInstance() {
         if (instance == null) {
-            synchronized (FileBasedConfigurationBuilder.class){
-                if(instance == null) {
+            synchronized (FileBasedConfigurationBuilder.class) {
+                if (instance == null) {
                     instance = new FileBasedConfigurationBuilder();
                 }
             }
@@ -136,7 +137,7 @@ public class FileBasedConfigurationBuilder {
         return configuration;
     }
 
-    private FileBasedConfigurationBuilder(){
+    private FileBasedConfigurationBuilder() {
         buildConfiguration();
     }
 
@@ -416,6 +417,12 @@ public class FileBasedConfigurationBuilder {
                 }
             }
 
+            OMAttribute removeOnConsumeAttr = authEndpointQueryParamsElem.getAttribute(new QName(
+                    FrameworkConstants.Config.REMOVE_PARAM_ON_CONSUME));
+
+            if (removeOnConsumeAttr != null) {
+                removeAPIParametersOnConsume = Boolean.parseBoolean(removeOnConsumeAttr.getAttributeValue());
+            }
 
             for (Iterator authEndpointQueryParamElems = authEndpointQueryParamsElem
                     .getChildrenWithLocalName(FrameworkConstants.Config.ELEM_AUTH_ENDPOINT_QUERY_PARAM); authEndpointQueryParamElems
@@ -969,5 +976,10 @@ public class FileBasedConfigurationBuilder {
         }
 
         return false;
+    }
+
+    public boolean isRemoveAPIParametersOnConsume() {
+
+        return removeAPIParametersOnConsume;
     }
 }

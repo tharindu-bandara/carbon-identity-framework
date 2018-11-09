@@ -136,6 +136,8 @@ public abstract class FrameworkConstants {
         public static final String ELEM_REQ_PATH_AUTHENTICATOR = "RequestPathAuthenticators";
         public static final String ATTR_AUTH_ENDPOINT_QUERY_PARAM_NAME = "name";
         public static final String ATTR_AUTH_ENDPOINT_QUERY_PARAM_ACTION = "action";
+        public static final String REMOVE_PARAM_ON_CONSUME = "removeOnConsumeFromAPI";
+
         /**
          * Configuration name for setting the url for receiving tenant list upon any modification to a tenant
          */
