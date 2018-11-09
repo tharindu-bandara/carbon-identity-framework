@@ -174,7 +174,6 @@ public abstract class FrameworkConstants {
         public static final String QNAME_IDP_CONFIGS = "IdPConfigs";
         public static final String QNAME_SEQUENCES = "Sequences";
         public static final String QNAME_AUTH_ENDPOINT_QUERY_PARAMS = "AuthenticationEndpointQueryParams";
-        public static final String QNAME_AUTH_ENDPOINT_REDIRECT_PARAMS = "AuthenticationEndpointRedirectParams";
         /**
          * Configuration name for the collection of urls for receiving tenant list
          */
