@@ -1270,15 +1270,15 @@ public class FrameworkUtils {
     public static String getRedirectURLWithFilteredParams(String redirectUrl, Map<String, Serializable> dataStoreMap) {
 
         boolean configAvailable = FileBasedConfigurationBuilder.getInstance()
-                .isAuthEndpointQueryParamsConfigAvailable();
+                .isAuthEndpointRedirectParamsConfigAvailable();
 
         if (!configAvailable) {
             return redirectUrl;
         }
         List<String> queryParams = FileBasedConfigurationBuilder.getInstance()
-                .getAuthEndpointQueryParams();
+                .getAuthEndpointRedirectParams();
         String action = FileBasedConfigurationBuilder.getInstance()
-                .getAuthEndpointQueryParamsAction();
+                .getAuthEndpointRedirectParamsAction();
 
         URIBuilder uriBuilder;
         try {
