@@ -109,13 +109,12 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        boolean responseWrapped = false;
         CommonAuthResponseWrapper responseWrapper = null;
         if (response instanceof CommonAuthResponseWrapper) {
             responseWrapper = (CommonAuthResponseWrapper) response;
         } else {
             responseWrapper = new CommonAuthResponseWrapper(response);
-            responseWrapped = true;
+            responseWrapper.setWrappedByFramework(true);
         }
         AuthenticationContext context = null;
         String sessionDataKey = request.getParameter("sessionDataKey");
@@ -201,7 +200,7 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
                 log.error("Context does not exist. Probably due to invalidated cache");
                 FrameworkUtils.sendToRetryPage(request, responseWrapper);
             }
-            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
+            unwrapResponse(responseWrapper, sessionDataKey, response, context);
         } catch (JsFailureException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Script initiated Exception occured.", e);
@@ -210,10 +209,10 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
             if (log.isDebugEnabled()) {
                 log.debug("User will be redirected to retry page or the error page provided by script.");
             }
-            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
+            unwrapResponse(responseWrapper, sessionDataKey, response, context);
         } catch (MisconfigurationException e) {
             FrameworkUtils.sendToRetryPage(request, response, "misconfiguration.error","something.went.wrong.contact.admin");
-            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
+            unwrapResponse(responseWrapper, sessionDataKey, response, context);
         } catch (PostAuthenticationFailedException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Error occurred while evaluating post authentication", e);
@@ -222,15 +221,15 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
                     FrameworkUtils.getPASTRCookieName(context.getContextIdentifier()));
             publishAuthenticationFailure(request, context, context.getSequenceConfig().getAuthenticatedUser());
             FrameworkUtils.sendToRetryPage(request, response, "Authentication attempt failed.", e.getErrorCode());
-            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
+            unwrapResponse(responseWrapper, sessionDataKey, response, context);
         } catch (Throwable e) {
             log.error("Exception in Authentication Framework", e);
             FrameworkUtils.sendToRetryPage(request, responseWrapper);
-            unwrapResponse(responseWrapped, responseWrapper, sessionDataKey, response, context);
+            unwrapResponse(responseWrapper, sessionDataKey, response, context);
         }
     }
 
-    protected void unwrapResponse(boolean wrapped, CommonAuthResponseWrapper responseWrapper, String sessionDataKey,
+    protected void unwrapResponse(CommonAuthResponseWrapper responseWrapper, String sessionDataKey,
                                   HttpServletResponse response, AuthenticationContext context) throws IOException {
 
         if (responseWrapper.isRedirect()) {
@@ -243,12 +242,12 @@ public class DefaultRequestCoordinator extends AbstractRequestCoordinator implem
                         sessionDataKey);
                 redirectURL = responseWrapper.getRedirectURL();
             }
-            if (wrapped) {
+            if (responseWrapper.isWrappedByFramework()) {
                 response.sendRedirect(redirectURL);
             } else {
                 responseWrapper.sendRedirect(redirectURL);
             }
-        } else if (wrapped) {
+        } else if (responseWrapper.isWrappedByFramework()) {
             responseWrapper.write();
         }
     }

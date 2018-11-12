@@ -97,6 +97,9 @@ public class FileBasedConfigurationBuilder {
     private String authEndpointQueryParamsAction;
     private boolean authEndpointQueryParamsConfigAvailable;
     private boolean removeAPIParametersOnConsume;
+    private boolean authEndpointRedirectParamsConfigAvailable;
+    private String authEndpointRedirectParamsAction;
+    private List<String> authEndpointRedirectParams = new ArrayList<>();
 
     public static FileBasedConfigurationBuilder getInstance() {
         if (instance == null) {
@@ -188,6 +191,9 @@ public class FileBasedConfigurationBuilder {
 
             // ########### Read Authentication Endpoint Query Params ###########
             readAuthenticationEndpointQueryParams(rootElement);
+
+            // ########### Read Authentication Endpoint Redirect Filter Params ###########
+            readAuthenticationEndpointRedirectParams(rootElement);
 
             //########### Read Extension Points ###########
             readExtensionPoints(rootElement);
@@ -417,13 +423,6 @@ public class FileBasedConfigurationBuilder {
                 }
             }
 
-            OMAttribute removeOnConsumeAttr = authEndpointQueryParamsElem.getAttribute(new QName(
-                    FrameworkConstants.Config.REMOVE_PARAM_ON_CONSUME));
-
-            if (removeOnConsumeAttr != null) {
-                removeAPIParametersOnConsume = Boolean.parseBoolean(removeOnConsumeAttr.getAttributeValue());
-            }
-
             for (Iterator authEndpointQueryParamElems = authEndpointQueryParamsElem
                     .getChildrenWithLocalName(FrameworkConstants.Config.ELEM_AUTH_ENDPOINT_QUERY_PARAM); authEndpointQueryParamElems
                          .hasNext(); ) {
@@ -432,6 +431,46 @@ public class FileBasedConfigurationBuilder {
 
                 if (queryParamName != null) {
                     this.authEndpointQueryParams.add(queryParamName);
+                }
+            }
+        }
+    }
+
+    private void readAuthenticationEndpointRedirectParams(OMElement documentElement) {
+
+        OMElement authEndpointRedirectParamsElem = documentElement.getFirstChildWithName(
+                IdentityApplicationManagementUtil.getQNameWithIdentityApplicationNS(
+                        FrameworkConstants.Config.QNAME_AUTH_ENDPOINT_REDIRECT_PARAMS));
+
+        if (authEndpointRedirectParamsElem != null) {
+
+            authEndpointRedirectParamsConfigAvailable = true;
+            OMAttribute actionAttr = authEndpointRedirectParamsElem.getAttribute(new QName(
+                    FrameworkConstants.Config.ATTR_AUTH_ENDPOINT_QUERY_PARAM_ACTION));
+            OMAttribute removeOnConsumeAttr = authEndpointRedirectParamsElem.getAttribute(new QName(
+                    FrameworkConstants.Config.REMOVE_PARAM_ON_CONSUME));
+            authEndpointRedirectParamsAction = FrameworkConstants.AUTH_ENDPOINT_QUERY_PARAMS_ACTION_EXCLUDE;
+
+            if (actionAttr != null) {
+                String actionValue = actionAttr.getAttributeValue();
+
+                if (actionValue != null && !actionValue.isEmpty()) {
+                    authEndpointRedirectParamsAction = actionValue;
+                }
+            }
+
+            if (removeOnConsumeAttr != null) {
+                removeAPIParametersOnConsume = Boolean.parseBoolean(removeOnConsumeAttr.getAttributeValue());
+            }
+
+            for (Iterator authEndpointRedirectParamElems = authEndpointRedirectParamsElem
+                    .getChildrenWithLocalName(FrameworkConstants.Config.ELEM_AUTH_ENDPOINT_REDIRECT_PARAM);
+                 authEndpointRedirectParamElems.hasNext(); ) {
+                String redirectParamName = processAuthEndpointQueryParamElem((OMElement) authEndpointRedirectParamElems
+                        .next());
+
+                if (redirectParamName != null) {
+                    this.authEndpointRedirectParams.add(redirectParamName);
                 }
             }
         }
@@ -981,5 +1020,20 @@ public class FileBasedConfigurationBuilder {
     public boolean isRemoveAPIParametersOnConsume() {
 
         return removeAPIParametersOnConsume;
+    }
+
+    public boolean isAuthEndpointRedirectParamsConfigAvailable() {
+
+        return authEndpointRedirectParamsConfigAvailable;
+    }
+
+    public String getAuthEndpointRedirectParamsAction() {
+
+        return authEndpointRedirectParamsAction;
+    }
+
+    public List<String> getAuthEndpointRedirectParams() {
+
+        return authEndpointRedirectParams;
     }
 }
