@@ -37,16 +37,15 @@
     String tenantDomain = request.getParameter(IdentityManagementEndpointConstants.TENANT_DOMAIN);
     NotificationApi notificationApi = new NotificationApi();
     try {
-        CodeValidationRequest validationRequest = new CodeValidationRequest();
-        validationRequest.setCode(confirmationKey);
-
         List<Property> properties = new ArrayList<Property>();
         Property tenantDomainProperty = new Property();
         tenantDomainProperty.setKey(MultitenantConstants.TENANT_DOMAIN);
         tenantDomainProperty.setValue(tenantDomain);
         properties.add(tenantDomainProperty);
-        validationRequest.setProperties(properties);
 
+        CodeValidationRequest validationRequest = new CodeValidationRequest();
+        validationRequest.setCode(confirmationKey);
+        validationRequest.setProperties(properties);
         notificationApi.validateCodePostCall(validationRequest);
         
     } catch (ApiException e) {
