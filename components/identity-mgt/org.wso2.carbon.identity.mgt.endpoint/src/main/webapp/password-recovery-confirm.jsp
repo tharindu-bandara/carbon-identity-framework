@@ -25,6 +25,10 @@
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.client.ApiException" %>
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.client.model.Error" %>
+<%@ page import="org.wso2.carbon.base.MultitenantConstants" %>
+<%@ page import="org.wso2.carbon.identity.mgt.endpoint.client.model.Property" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <jsp:directive.include file="localize.jsp"/>
 
 <%
@@ -35,6 +39,14 @@
     try {
         CodeValidationRequest validationRequest = new CodeValidationRequest();
         validationRequest.setCode(confirmationKey);
+
+        List<Property> properties = new ArrayList<Property>();
+        Property tenantDomainProperty = new Property();
+        tenantDomainProperty.setKey(MultitenantConstants.TENANT_DOMAIN);
+        tenantDomainProperty.setValue(tenantDomain);
+        properties.add(tenantDomainProperty);
+        validationRequest.setProperties(properties);
+
         notificationApi.validateCodePostCall(validationRequest);
         
     } catch (ApiException e) {
