@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.application.authentication.framework.model;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.application.authentication.framework.LocalApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.config.model.AuthenticatorConfig;
 
 import java.io.Serializable;
@@ -149,14 +150,47 @@ public class AuthenticatedIdPData implements Serializable {
 
     /**
      * Checks whether the the given authenticator is an authenticator which the user has already authenticated with.
+     * @deprecated use {@link #isAlreadyAuthenticatedUsing(String, String)} instead.
      *
      * @param authenticatorName Name of the authenticator to be verified.
      * @return true if the user has been authenticated with the given authenticator.
      */
+    @Deprecated
     public boolean isAlreadyAuthenticatedUsing(String authenticatorName) {
 
         for (AuthenticatorConfig authenticator : getAuthenticators()) {
             if (authenticator.getName().equals(authenticatorName)) {
+                if (log.isDebugEnabled()) {
+                    log.debug(String.format("User '%s' is already authenticated using the " +
+                                    "IDP : '%s'and the authenticator : '%s'.",
+                            user.getUserName(), idpName, authenticator.getName()));
+                }
+                return true;
+            }
+        }
+
+        if(log.isDebugEnabled()){
+            log.debug(String.format("User '%s' was not authenticated using the " +
+                            "IDP : '%s'and the authenticator : '%s' before.",
+                    user.getUserName(), idpName, authenticatorName));
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether the the given authenticator is an authenticator which the user has already authenticated with.
+     *
+     * @param authenticatorName Name of the authenticator to be verified.
+     * @param authMechanism     Authentication mechanism.
+     * @return true if the user has been authenticated with the given authenticator.
+     */
+    public boolean isAlreadyAuthenticatedUsing(String authenticatorName, String authMechanism) {
+
+        for (AuthenticatorConfig authenticator : getAuthenticators()) {
+            if (authenticator.getName().equals(authenticatorName)
+                    || (authenticator.getApplicationAuthenticator() != null
+                            && authenticator.getApplicationAuthenticator().getAuthMechanism().equals(authMechanism))) {
                 if (log.isDebugEnabled()) {
                     log.debug(String.format("User '%s' is already authenticated using the " +
                                     "IDP : '%s'and the authenticator : '%s'.",
