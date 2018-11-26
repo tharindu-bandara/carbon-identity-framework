@@ -50,7 +50,7 @@
     }
 
     int numberOfPages = 0;
-	int noOfPageLinksToDisplay = 5;
+    int noOfPageLinksToDisplay = 5;
     String pageNumber = request.getParameter("pageNumber");
     if (pageNumber == null) {
         pageNumber = "0";
