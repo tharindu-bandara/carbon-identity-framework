@@ -55,6 +55,7 @@ public abstract class AbstractApplicationAuthenticator implements ApplicationAut
 
     private static final long serialVersionUID = -4406878411547612129L;
     private static final Log log = LogFactory.getLog(AbstractApplicationAuthenticator.class);
+    public static final String AUTH_MECHANISM = "AuthMechanism";
 
     @Override
     public AuthenticatorFlowStatus process(HttpServletRequest request,
@@ -277,5 +278,15 @@ public abstract class AbstractApplicationAuthenticator implements ApplicationAut
             return runtimeParams;
         }
         return Collections.emptyMap();
+    }
+
+    @Override
+    public String getAuthMechanism() {
+
+        String authMechanism = getAuthenticatorConfig().getParameterMap().get(AUTH_MECHANISM);
+        if (StringUtils.isEmpty(authMechanism)) {
+            authMechanism = getName();
+        }
+        return authMechanism;
     }
 }
