@@ -21,11 +21,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.application.authentication.framework.exception.UserSessionException;
 import org.wso2.carbon.identity.core.AbstractIdentityUserOperationEventListener;
+import org.wso2.carbon.identity.core.model.IdentityEventListenerConfig;
 import org.wso2.carbon.identity.core.util.IdentityCoreConstants;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.mgt.internal.IdentityMgtServiceComponent;
+import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
+import org.wso2.carbon.user.core.listener.UserOperationEventListener;
+
+import java.util.Map;
 
 /**
  * This is an implementation of UserOperationEventListener which is responsible for termination of active sessions
@@ -50,7 +56,7 @@ public class UserSessionTerminationListener extends AbstractIdentityUserOperatio
     }
 
     @Override
-    public boolean doPostUpdateCredentialByAdmin(String userName, Object credential, UserStoreManager userStoreManager)
+    public boolean doPostUpdateCredentialByAdmin(String username, Object credential, UserStoreManager userStoreManager)
             throws UserStoreException {
 
         if (!isEnable()) {
@@ -62,21 +68,15 @@ public class UserSessionTerminationListener extends AbstractIdentityUserOperatio
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Terminating all the active sessions of the password reset user: " + userName);
+            log.debug("Terminating all the active sessions of the password reset user: " + username);
         }
 
-        try {
-            IdentityMgtServiceComponent.getUserSessionManagementService()
-                    .terminateSessionsOfUser(userName, userStoreManager);
-        } catch (UserSessionException e) {
-            throw new UserStoreException("Error while terminating the sessions of the user: " + userName +
-                    " after password reset.", e);
-        }
+        terminateSessionsOfUser(username, userStoreManager);
         return true;
     }
 
     @Override
-    public boolean doPreDeleteUser(String userName, UserStoreManager userStoreManager)
+    public boolean doPreDeleteUser(String username, UserStoreManager userStoreManager)
             throws UserStoreException {
 
         if (!isEnable()) {
@@ -88,16 +88,100 @@ public class UserSessionTerminationListener extends AbstractIdentityUserOperatio
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Terminating all the active sessions of the deleted user: " + userName);
+            log.debug("Terminating all the active sessions of the deleted user: " + username);
         }
 
-        try {
-            IdentityMgtServiceComponent.getUserSessionManagementService()
-                    .terminateSessionsOfUser(userName, userStoreManager);
-        } catch (UserSessionException e) {
-            throw new UserStoreException("Error while terminating the active sessions of the user: " + userName +
-                    " before deletion.", e);
-        }
+        terminateSessionsOfUser(username, userStoreManager);
         return true;
+    }
+
+    @Override
+    public boolean doPostSetUserClaimValues(String username, Map<String, String> claims, String profileName, UserStoreManager userStoreManager) throws UserStoreException {
+
+        if (!isEnable()) {
+            return true;
+        }
+
+        if (!Boolean.parseBoolean(IdentityUtil.getProperty(USER_SESSION_MAPPING_ENABLED))) {
+            return true;
+        }
+
+        terminateSessionsOfLockedUserAccount(username, claims, userStoreManager);
+        terminateSessionsOfDisabledUserAccount(username, claims, userStoreManager);
+        return true;
+    }
+
+    @Override
+    public boolean doPostSetUserClaimValue(String username, UserStoreManager userStoreManager) throws UserStoreException {
+
+        if (!isEnable()) {
+            return true;
+        }
+
+        if (!Boolean.parseBoolean(IdentityUtil.getProperty(USER_SESSION_MAPPING_ENABLED))) {
+            return true;
+        }
+
+        return true;
+    }
+
+    private void terminateSessionsOfLockedUserAccount(String username, Map<String, String> claims, UserStoreManager
+            userStoreManager) throws UserStoreException {
+
+        String errorCode = (String) IdentityUtil.threadLocalProperties.get().get(IdentityCoreConstants.USER_ACCOUNT_STATE);
+
+        if (errorCode != null && (errorCode.equalsIgnoreCase(UserCoreConstants.ErrorCode.USER_IS_LOCKED))) {
+            if (log.isDebugEnabled()) {
+                log.debug("Terminating all active sessions of the locked user: " + username);
+            }
+            terminateSessionsOfUser(username, userStoreManager);
+        }
+    }
+
+    private void terminateSessionsOfDisabledUserAccount(String username, Map<String, String> claims, UserStoreManager
+            userStoreManager) throws UserStoreException {
+
+        String errorCode = (String) IdentityUtil.threadLocalProperties.get().get(IdentityCoreConstants.USER_ACCOUNT_STATE);
+
+        if (errorCode != null && errorCode.equalsIgnoreCase(IdentityCoreConstants.USER_ACCOUNT_DISABLED_ERROR_CODE)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Terminating all active sessions of the disabled user account of user: " + username);
+            }
+            terminateSessionsOfUser(username, userStoreManager);
+        }
+    }
+
+    private void terminateSessionsOfUser(String username, UserStoreManager userStoreManager) throws UserStoreException {
+
+        String userStoreDomain = userStoreManager.getRealmConfiguration().getUserStoreProperty(UserCoreConstants
+                .RealmConfig.PROPERTY_DOMAIN_NAME);
+        String tenantDomain = IdentityTenantUtil.getTenantDomain(userStoreManager.getTenantId());
+
+        try {
+            IdentityMgtServiceComponent.getUserSessionManagementService().terminateSessionsOfUser(username,
+                    userStoreDomain, tenantDomain);
+        } catch (UserSessionException e) {
+            log.error("Failed to terminate active sessions of user: " + username, e);
+        }
+    }
+
+    @Override
+    public boolean isEnable() {
+
+        /**
+         * If the event listener configuration is not present in identity.xml file under <EventListeners> the listener
+         * gets enabled by default.
+         * Thus this overrides the default behavior forcing the UserSessionTerminationListener to be
+         * configured explicitly in order to be enabled.
+         */
+
+        IdentityEventListenerConfig identityEventListenerConfig = IdentityUtil.readEventListenerProperty
+                (UserOperationEventListener.class.getName(), this.getClass().getName());
+
+        if (identityEventListenerConfig == null) {
+            return false;
+        }
+
+        return Boolean.parseBoolean(identityEventListenerConfig.getEnable());
     }
 }
