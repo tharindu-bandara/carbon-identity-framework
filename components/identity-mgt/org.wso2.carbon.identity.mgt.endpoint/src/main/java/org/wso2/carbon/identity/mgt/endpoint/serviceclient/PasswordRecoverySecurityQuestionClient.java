@@ -37,7 +37,7 @@ public class PasswordRecoverySecurityQuestionClient {
 
     StringBuilder builder = new StringBuilder();
     String url = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
-            .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL,
+            .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL_DOMAIN,
                     IdentityManagementEndpointConstants.UserInfoRecovery.REST_API_URL_DOMAIN);
 
     public Response initiateUserChallengeQuestion(User user) {
