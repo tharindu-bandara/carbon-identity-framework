@@ -432,16 +432,19 @@ public class IdentityProviderManager implements IdpManager {
                     SAML_METADATA_VALIDITY_PERIOD_DEFAULT);
         }
         propertiesList.add(samlMetadataValidityPeriodProperty);
+
         Property samlMetadataSigningEnabledProperty = IdentityApplicationManagementUtil.getProperty(saml2SSOFedAuthn.
                 getProperties(), IdentityApplicationConstants.Authenticator.SAML2SSO.
                 SAML_METADATA_SIGNING_ENABLED);
         if (samlMetadataSigningEnabledProperty == null) {
-            samlMetadataValidityPeriodProperty = new Property();
-            samlMetadataValidityPeriodProperty.setName(IdentityApplicationConstants.Authenticator.SAML2SSO.
+            samlMetadataSigningEnabledProperty = new Property();
+            samlMetadataSigningEnabledProperty.setName(IdentityApplicationConstants.Authenticator.SAML2SSO.
                     SAML_METADATA_SIGNING_ENABLED);
-            samlMetadataValidityPeriodProperty.setValue(IdentityApplicationConstants.Authenticator.SAML2SSO.
+            samlMetadataSigningEnabledProperty.setValue(IdentityApplicationConstants.Authenticator.SAML2SSO.
                     SAML_METADATA_SIGNING_ENABLED_DEFAULT);
         }
+        propertiesList.add(samlMetadataSigningEnabledProperty);
+
         saml2SSOFedAuthn.setProperties(propertiesList.toArray(new Property[propertiesList.size()]));
         fedAuthnCofigs.add(saml2SSOFedAuthn);
 
