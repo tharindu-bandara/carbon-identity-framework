@@ -678,8 +678,12 @@ public class UserRealmProxy {
                     .getUserStoreProperty("UsernameJavaRegExViolationErrorMsg"));
             //TODO  Need to get value from UserCoreConstants.RealmConfig.PROPERTY_PASSWORD_ERROR_MSG
 
-            info.setUserNameRegEx(
-                    realmConfig.getUserStoreProperty(UserCoreConstants.RealmConfig.PROPERTY_USER_NAME_JS_REG_EX));
+            String regex = realmConfig.getUserStoreProperty(UserCoreConstants.RealmConfig.PROPERTY_USER_NAME_JS_REG_EX);
+            //Inorder to support both UsernameJavaScriptRegEx ancUserNameJavaScriptRegEx
+            if (StringUtils.isBlank(regex)) {
+                regex = realmConfig.getUserStoreProperty(UserCoreConstants.RealmConfig.PROPERTY_USER_NAME_JS_REG);
+            }
+            info.setUserNameRegEx(regex);
 
             info.setRoleNameRegEx(
                     realmConfig.getUserStoreProperty(UserCoreConstants.RealmConfig.PROPERTY_ROLE_NAME_JS_REG_EX));
