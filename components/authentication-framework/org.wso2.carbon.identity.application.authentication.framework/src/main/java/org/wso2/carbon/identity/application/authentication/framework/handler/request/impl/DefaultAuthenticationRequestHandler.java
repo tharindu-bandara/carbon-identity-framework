@@ -509,7 +509,8 @@ public class DefaultAuthenticationRequestHandler implements AuthenticationReques
                     UserSessionStore.getInstance().storeUserSessionData(userId, sessionContextKey);
                 }
             } catch (UserSessionException e) {
-                throw new UserSessionException("Error while storing the session data.", e);
+                throw new UserSessionException("Error while storing session data for user: " + userName + " of " +
+                        "user store domain: " + userStoreDomain + " in tenant domain: " + tenantDomain , e);
             }
         }
     }

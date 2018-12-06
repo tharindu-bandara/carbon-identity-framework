@@ -32,8 +32,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 /**
  * Class to store and retrieve user related data.
@@ -44,8 +45,17 @@ public class UserSessionStore {
 
     private static UserSessionStore instance = new UserSessionStore();
     private static final String FEDERATED_USER_DOMAIN = "FEDERATED";
+    private static final String DELETE_CHUNK_SIZE_PROPERTY = "JDBCPersistenceManager.SessionDataPersist" +
+            ".UserSessionMapping.DeleteChunkSize";
+
+    private int deleteChunkSize = 10000;
 
     private UserSessionStore() {
+
+        String deleteChunkSizeString = IdentityUtil.getProperty(DELETE_CHUNK_SIZE_PROPERTY);
+        if (StringUtils.isNotBlank(deleteChunkSizeString)) {
+            deleteChunkSize = Integer.parseInt(deleteChunkSizeString);
+        }
     }
 
     public static UserSessionStore getInstance() {
@@ -329,25 +339,23 @@ public class UserSessionStore {
      */
     public void removeExpiredSessionRecords() {
 
-        long cleanupLimitNano = FrameworkUtils.getCurrentStandardNano() -
-                TimeUnit.MINUTES.toNanos(IdentityUtil.getOperationCleanUpTimeout());
-        List<String> terminatedAuthSessionIds = new ArrayList<>();
-        try (Connection connection = IdentityDatabaseUtil.getDBConnection();
-             PreparedStatement preparedStatement = connection
-                     .prepareStatement(SQLQueries.SQL_SELECT_TERMINATED_SESSION_IDS)) {
-            preparedStatement.setLong(1, cleanupLimitNano);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    terminatedAuthSessionIds.add(resultSet.getString(1));
-                }
-            }
+        if (log.isDebugEnabled()) {
+            log.debug("Removing session to user mappings for expired and deleted sessions.");
+        }
 
-            for (String terminatedSessionId : terminatedAuthSessionIds) {
-                try (PreparedStatement preparedStatementForDelete = connection
-                        .prepareStatement(SQLQueries.SQL_DELETE_TERMINATED_SESSION_DATA)) {
-                    preparedStatementForDelete.setString(1, terminatedSessionId);
-                    preparedStatementForDelete.addBatch();
-                    preparedStatementForDelete.executeBatch();
+        try (Connection connection = IdentityDatabaseUtil.getDBConnection()) {
+            Set<String> terminatedAuthSessionIds = getSessionsTerminated(connection);
+
+            if (!terminatedAuthSessionIds.isEmpty()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Session to user mappings for " + terminatedAuthSessionIds.size() + " no of sessions has " +
+                            "to be removed. Removing in " + deleteChunkSize + " size batches.");
+                }
+
+                deleteSessionToUserMappingsFor(terminatedAuthSessionIds, connection);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("No terminated sessions found to remove session to user mappings.");
                 }
             }
 
@@ -360,4 +368,68 @@ public class UserSessionStore {
                     , e);
         }
     }
+
+    private Set<String> getSessionsTerminated(Connection connection) throws SQLException {
+
+        Set<String> terminatedSessionIds = new HashSet<>();
+
+        /**
+         * Retrieve only sessions which have an expiry time less than the current time.
+         * As the session cleanup task deletes only entries matching the same condition, in case sessions that are
+         * being marked as deleted are also retrieved that might load a huge amount of entries to the memory all the
+         * time. Yet those entries will be removed from the IDN_AUTH_USER_SESSION_MAPPING table on the first
+         * execution, and there after every time the loop will be executed and the table will be scanned for a non
+         * existing entry.
+         */
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries
+                .SQL_SELECT_TERMINATED_SESSION_IDS)) {
+            preparedStatement.setLong(1, FrameworkUtils.getCurrentStandardNano());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    terminatedSessionIds.add(resultSet.getString(1));
+                }
+            }
+        }
+
+        return terminatedSessionIds;
+    }
+
+    private void deleteSessionToUserMappingsFor(Set<String> terminatedSessionIds, Connection connection) throws
+            SQLException {
+
+        String[] sessionsToRemove = new String[terminatedSessionIds.size()];
+        terminatedSessionIds.toArray(sessionsToRemove);
+
+        int totalSessionsToRemove = sessionsToRemove.length;
+        int iterations = (totalSessionsToRemove / deleteChunkSize) + 1;
+        int startCount = 0;
+        for (int i = 0; i < iterations; i++) {
+
+            int endCount = (i + 1) * deleteChunkSize;
+            if (totalSessionsToRemove < endCount) {
+                endCount = totalSessionsToRemove;
+            }
+
+            try (PreparedStatement preparedStatementForDelete = connection
+                    .prepareStatement(SQLQueries.SQL_DELETE_TERMINATED_SESSION_DATA)) {
+
+                for (int j = startCount; j < endCount; j++) {
+                    preparedStatementForDelete.setString(1, sessionsToRemove[j]);
+                    preparedStatementForDelete.addBatch();
+                }
+                preparedStatementForDelete.executeBatch();
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Removed  " + (endCount - startCount) + " session to user mappings.");
+                }
+            }
+
+            startCount = endCount;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Removed total of " + totalSessionsToRemove + " session to user mappings.");
+        }
+    }
+
 }
