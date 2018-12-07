@@ -53,7 +53,7 @@ public class ApiClient {
     private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
     private String basePath = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
             .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL_DOMAIN,
-                    "api/identity/recovery/v0.9");
+                    "/api/identity/recovery/v0.9");
     private boolean debugging = false;
     private int connectionTimeout = 0;
 

@@ -44,7 +44,7 @@ public class SecurityQuestionApi {
 
     String basePath = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
             .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL_DOMAIN,
-                    "api/identity/recovery/v0.9");
+                    "/api/identity/recovery/v0.9");
 
     public SecurityQuestionApi() {
         this(Configuration.getDefaultApiClient());
