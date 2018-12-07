@@ -41,7 +41,7 @@ public class PasswordRecoveryApi {
 
     String basePath = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
             .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL_DOMAIN,
-                    "api/identity/recovery/v0.9");
+                    "/api/identity/recovery/v0.9");
 
     public PasswordRecoveryApi() {
         this(Configuration.getDefaultApiClient());

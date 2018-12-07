@@ -47,7 +47,7 @@ public class NotificationApi {
 
     String basePath = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
             .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL,
-                    "api/identity/recovery/v0.9");
+                    "/api/identity/recovery/v0.9");
 
     public NotificationApi() {
 
