@@ -143,7 +143,6 @@
      if (ApplicationMgtUIUtil.JWKS_URI.equals(spProperty.getName())) {
           hasJWKSUri = true;
           jwksUri = spProperty.getValue();
-          System.out.println("JWKS "+ jwksUri);
           }
        }
     }
