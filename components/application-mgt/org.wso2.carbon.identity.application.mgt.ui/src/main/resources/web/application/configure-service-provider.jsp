@@ -1288,8 +1288,7 @@
 
                         <!-----Add radio button to select certificate or jwks end point fro sp--------------->
                         <tr>
-                            <td class="leftCol-med labelField">
-                            Select SP Certificate Type</td>
+                            <td class="leftCol-med labelField"> Select SP Certificate Type </td>
                                 <td>
                                     <label style="display:block">
                                     <input type="radio" id="choose_jwks_uri" name="choose_certificate_type"
@@ -1384,7 +1383,9 @@
                         </tr>
                         <!-----jwks text box JWKS TEXT BOX------->
                         <tr id="use_jwks_uri" <% if (appBean.getServiceProvider().getCertificateContent() != null) { %> style="display:none" <% } %>>
-                            <td style="width:15%" class="leftCol-med labelField">JWKS URI:</td>
+                            <td style="width:15%" class="leftCol-med labelField">
+                            <fmt:message key="config.application.JWKS"/>
+                            </td>
                             <td>
                                <input  id="jwksUri" name="jwksUri" type="text" value="<%=Encode.forHtmlAttribute(jwksUri)%>"
                                   autofocus required/>

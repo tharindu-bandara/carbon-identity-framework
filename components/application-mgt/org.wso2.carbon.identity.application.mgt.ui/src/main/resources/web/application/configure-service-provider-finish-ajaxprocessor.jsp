@@ -69,7 +69,8 @@
                     CertData certData = IdentityApplicationManagementUtil.getCertData(IdentityUtil.getCertificateString(certString));
                 }
 
-                if (!request.getParameter("jwksUri").equals("") && (!request.getParameter("jwksUri").contains("https"))) {
+                if (request.getParameter("choose_certificate_type").equals("choose_jwks_uri") &&
+                !request.getParameter("jwksUri").equals("") && (!request.getParameter("jwksUri").contains("https"))) {
                      String message = "Invalid jwks uri";
                      CarbonUIMessage.sendCarbonUIMessage(message, CarbonUIMessage.ERROR, request);
                 } else {
