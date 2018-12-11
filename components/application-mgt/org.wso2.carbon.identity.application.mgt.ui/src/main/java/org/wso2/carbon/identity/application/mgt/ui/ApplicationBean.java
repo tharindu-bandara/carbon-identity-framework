@@ -1127,6 +1127,7 @@ public class ApplicationBean {
         //value recieved from the request
         for (ServiceProviderProperty spProperty : spPropList) {
             if ((ApplicationMgtUIUtil.JWKS_URI.equals(spProperty.getName()) && !jwks.equals(spProperty.getValue()))
+                    || (ApplicationMgtUIUtil.JWKS_URI.equals(spProperty.getName()) && jwks.equals(spProperty.getValue()))
                     || (ApplicationMgtUIUtil.JWKS_URI.equals(spProperty.getName()) && jwks.equals(""))) {
                 //remove the serivice provider property from array
                 spPropList.remove(spPropList.indexOf(spProperty));
@@ -1135,7 +1136,7 @@ public class ApplicationBean {
             }
         }
         //if a new value is set for the jwks uri add it to the service provider properties
-        if (!jwks.equals("") || jwksExist) {
+        if ((!jwks.equals("") || !jwksExist)) {
             propertyForJWKS.setDisplayName(ApplicationMgtUIUtil.JWKS_DISPLAYNAME);
             propertyForJWKS.setName(ApplicationMgtUIUtil.JWKS_URI);
             propertyForJWKS.setValue(jwks);
