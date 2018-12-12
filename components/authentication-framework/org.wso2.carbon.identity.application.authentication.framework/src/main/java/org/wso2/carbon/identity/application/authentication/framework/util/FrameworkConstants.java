@@ -177,7 +177,7 @@ public abstract class FrameworkConstants {
         public static final String QNAME_SEQUENCES = "Sequences";
         public static final String QNAME_AUTH_ENDPOINT_QUERY_PARAMS = "AuthenticationEndpointQueryParams";
         public static final String QNAME_AUTH_ENDPOINT_REDIRECT_PARAMS = "AuthenticationEndpointRedirectParams";
-        public static final String QNAME_WHITE_LISTED_HOSTS = "WhiteListedHostNames";
+        public static final String QNAME_FILTERING_ENABLED_HOST_NAMES = "FilteringEnabledHostNames";
         /**
          * Configuration name for the collection of urls for receiving tenant list
          */

@@ -1291,9 +1291,8 @@ public class FrameworkUtils {
         }
 
         // If the host name is not white listed then the query params will not be removed from the redirect url.
-        List<String> whiteListedHosts = FileBasedConfigurationBuilder.getInstance()
-                .getWhiteListedHostNames();
-        if (CollectionUtils.isNotEmpty(whiteListedHosts) && whiteListedHosts.contains(uriBuilder.getHost())) {
+        List<String> filteringEnabledHosts = FileBasedConfigurationBuilder.getInstance().getFilteringEnabledHostNames();
+        if (CollectionUtils.isNotEmpty(filteringEnabledHosts) && !filteringEnabledHosts.contains(uriBuilder.getHost())) {
             return redirectUrl;
         }
 

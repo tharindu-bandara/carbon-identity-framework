@@ -100,7 +100,7 @@ public class FileBasedConfigurationBuilder {
     private boolean authEndpointRedirectParamsConfigAvailable;
     private String authEndpointRedirectParamsAction;
     private List<String> authEndpointRedirectParams = new ArrayList<>();
-    private List<String> whiteListedHostNames = new ArrayList<>();
+    private List<String> filteringEnabledHostNames = new ArrayList<>();
 
     public static FileBasedConfigurationBuilder getInstance() {
         if (instance == null) {
@@ -197,7 +197,7 @@ public class FileBasedConfigurationBuilder {
             readAuthenticationEndpointRedirectParams(rootElement);
 
             // ########### Read White Listed Host Names ###########
-            readWhiteListedHostNames(rootElement);
+            readFilteringEnabledHostNames(rootElement);
 
             //########### Read Extension Points ###########
             readExtensionPoints(rootElement);
@@ -440,18 +440,20 @@ public class FileBasedConfigurationBuilder {
         }
     }
 
-    private void readWhiteListedHostNames(OMElement documentElement){
+    private void readFilteringEnabledHostNames(OMElement documentElement){
 
-        OMElement whiteListedHostNamesElem = documentElement.getFirstChildWithName(IdentityApplicationManagementUtil.
-                getQNameWithIdentityApplicationNS(FrameworkConstants.Config.QNAME_WHITE_LISTED_HOSTS));
+        OMElement filteringEnabledHostNamesElem = documentElement.getFirstChildWithName(IdentityApplicationManagementUtil.
+                getQNameWithIdentityApplicationNS(FrameworkConstants.Config.QNAME_FILTERING_ENABLED_HOST_NAMES));
 
-        if (whiteListedHostNamesElem != null) {
-            Iterator<OMElement> hostNames = whiteListedHostNamesElem.getChildrenWithName(IdentityApplicationManagementUtil.
+        if (filteringEnabledHostNamesElem != null) {
+            Iterator<OMElement> hostNames = filteringEnabledHostNamesElem.getChildrenWithName(IdentityApplicationManagementUtil.
                     getQNameWithIdentityApplicationNS(FrameworkConstants.Config.ELEM_HOST_NAME));
             if (hostNames != null) {
                 while (hostNames.hasNext()) {
                     OMElement hostNameElement = hostNames.next();
-                    whiteListedHostNames.add(hostNameElement.getText());
+                    if (hostNameElement != null) {
+                        filteringEnabledHostNames.add(hostNameElement.getText());
+                    }
                 }
             }
         }
@@ -1058,8 +1060,8 @@ public class FileBasedConfigurationBuilder {
         return authEndpointRedirectParams;
     }
 
-    public List<String> getWhiteListedHostNames() {
+    public List<String> getFilteringEnabledHostNames() {
 
-        return whiteListedHostNames;
+        return filteringEnabledHostNames;
     }
 }
