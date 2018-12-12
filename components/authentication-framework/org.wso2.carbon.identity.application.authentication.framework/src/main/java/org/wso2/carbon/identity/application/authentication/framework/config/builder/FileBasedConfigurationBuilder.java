@@ -100,6 +100,7 @@ public class FileBasedConfigurationBuilder {
     private boolean authEndpointRedirectParamsConfigAvailable;
     private String authEndpointRedirectParamsAction;
     private List<String> authEndpointRedirectParams = new ArrayList<>();
+    private List<String> whiteListedHostNames = new ArrayList<>();
 
     public static FileBasedConfigurationBuilder getInstance() {
         if (instance == null) {
@@ -194,6 +195,9 @@ public class FileBasedConfigurationBuilder {
 
             // ########### Read Authentication Endpoint Redirect Filter Params ###########
             readAuthenticationEndpointRedirectParams(rootElement);
+
+            // ########### Read White Listed Host Names ###########
+            readWhiteListedHostNames(rootElement);
 
             //########### Read Extension Points ###########
             readExtensionPoints(rootElement);
@@ -431,6 +435,23 @@ public class FileBasedConfigurationBuilder {
 
                 if (queryParamName != null) {
                     this.authEndpointQueryParams.add(queryParamName);
+                }
+            }
+        }
+    }
+
+    private void readWhiteListedHostNames(OMElement documentElement){
+
+        OMElement whiteListedHostNamesElem = documentElement.getFirstChildWithName(IdentityApplicationManagementUtil.
+                getQNameWithIdentityApplicationNS(FrameworkConstants.Config.QNAME_WHITE_LISTED_HOSTS));
+
+        if (whiteListedHostNamesElem != null) {
+            Iterator<OMElement> hostNames = whiteListedHostNamesElem.getChildrenWithName(IdentityApplicationManagementUtil.
+                    getQNameWithIdentityApplicationNS(FrameworkConstants.Config.ELEM_HOST_NAME));
+            if (hostNames != null) {
+                while (hostNames.hasNext()) {
+                    OMElement hostNameElement = hostNames.next();
+                    whiteListedHostNames.add(hostNameElement.getText());
                 }
             }
         }
@@ -1035,5 +1056,10 @@ public class FileBasedConfigurationBuilder {
     public List<String> getAuthEndpointRedirectParams() {
 
         return authEndpointRedirectParams;
+    }
+
+    public List<String> getWhiteListedHostNames() {
+
+        return whiteListedHostNames;
     }
 }

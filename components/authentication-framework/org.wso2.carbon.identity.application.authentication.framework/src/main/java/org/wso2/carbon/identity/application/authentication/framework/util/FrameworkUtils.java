@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.application.authentication.framework.util;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -1288,8 +1289,15 @@ public class FrameworkUtils {
             log.warn("Unable to filter redirect params for url." + redirectUrl, e);
             return redirectUrl;
         }
-        List<NameValuePair> queryParamsList = uriBuilder.getQueryParams();
 
+        // If the host name is not white listed then the query params will not be removed from the redirect url.
+        List<String> whiteListedHosts = FileBasedConfigurationBuilder.getInstance()
+                .getWhiteListedHostNames();
+        if (CollectionUtils.isNotEmpty(whiteListedHosts) && whiteListedHosts.contains(uriBuilder.getHost())) {
+            return redirectUrl;
+        }
+
+        List<NameValuePair> queryParamsList = uriBuilder.getQueryParams();
         if (action != null
                 && action.equals(FrameworkConstants.AUTH_ENDPOINT_QUERY_PARAMS_ACTION_EXCLUDE)) {
             if (queryParamsList != null) {
