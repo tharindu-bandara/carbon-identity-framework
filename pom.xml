@@ -46,6 +46,7 @@
         <module>components/idp-mgt</module>
         <module>components/claim-mgt</module>
         <module>components/directory-server-manager</module>
+        <module>components/configuration-mgt</module>
         <module>components/security-mgt</module>
         <module>components/workflow-mgt</module>
         <module>components/policy-editor</module>
@@ -730,6 +731,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.mgt.stub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.configuration.mgt.core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1762,6 +1768,7 @@
 
         <javax.xml.range>[0.0.0,1.0.0)</javax.xml.range>
         <org.apache.xml.security.range>[0.0.0,2.0.0)</org.apache.xml.security.range>
+        <org.apache.olingo.version>1.1.0</org.apache.olingo.version>
 
 
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
