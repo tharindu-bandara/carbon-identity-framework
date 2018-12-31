@@ -28,7 +28,10 @@ public class ConfigurationConstants {
     public static final String DEFAULT_RESPONSE_CONTENT_TYPE = APPLICATION_JSON;
     public static final String STATUS_INTERNAL_SERVER_ERROR_MESSAGE_DEFAULT = "Internal server error";
     public static final String RESOURCE_PATH = "/resource";
+    public static final String ATTRIBUTE = "attribute";
+    public static final String FILE = "file";
     public static final String RESOURCE_TYPE_PATH = "/resource-type";
+    public static final String RESOURCE_FILE_BY_ID_PATH = "/resource/file";
     public static final String MY_SQL = "MySQL";
     public static final String POSTGRE_SQL = "PostgreSQL";
     public static final String DB2 = "DB2";
@@ -88,7 +91,15 @@ public class ConfigurationConstants {
         ERROR_CODE_RESOURCE_REPLACE_REQUEST_INVALID("CONFIGM_00033", "Resource replace request validation failed."),
         ERROR_CODE_REPLACE_RESOURCE("CONFIGM_00034", "Error while replacing the resource : %s."),
         ERROR_CODE_REPLACE_ATTRIBUTE("CONFIGM_00035", "Error while replacing the attribute: %s."),
-        ;
+        ERROR_CODE_FILE_IDENTIFIERS_REQUIRED("CONFIGM_00036", "File identifier validation failed for " +
+                "One or more file identifiers in: %s"),
+        ERROR_CODE_INSERT_FILE("CONFIGM_00037", "Error while adding the file: %s."),
+        ERROR_CODE_GET_FILE("CONFIGM_00038", "Error while retrieving the file: %s."),
+        ERROR_CODE_FILE_DOES_NOT_EXISTS("CONFIGM_00038", "File with the id: %s does not exists."),
+        ERROR_CODE_FILES_DOES_NOT_EXISTS("CONFIGM_00039", "Resource: %s does not contain any files."),
+        ERROR_CODE_GET_FILES("CONFIGM_00040", "Error while retrieving files the resource: %s."),
+        ERROR_CODE_DELETE_FILES("CONFIGM_00041", "Error while deleting files for the resource id: %s."),
+        ERROR_CODE_DELETE_FILE("CONFIGM_00042", "Error while deleting the file with id: %s.");
 
         private final String code;
         private final String message;

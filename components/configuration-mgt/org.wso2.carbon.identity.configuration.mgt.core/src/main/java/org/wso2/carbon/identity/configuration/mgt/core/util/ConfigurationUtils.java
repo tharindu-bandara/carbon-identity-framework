@@ -24,6 +24,7 @@ import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationMa
 
 import java.util.UUID;
 
+import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.RESOURCE_FILE_BY_ID_PATH;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.MAX_QUERY_LENGTH_SQL;
 
 public class ConfigurationUtils {
@@ -144,5 +145,10 @@ public class ConfigurationUtils {
     public static int getMaximumQueryLength() {
 
         return StringUtils.isEmpty(MAX_QUERY_LENGTH_SQL) ? 4194304 : Integer.parseInt(MAX_QUERY_LENGTH_SQL);
+    }
+
+    public static String getFilePath(String resourceFileId) {
+
+        return RESOURCE_FILE_BY_ID_PATH + "/" + resourceFileId;
     }
 }
