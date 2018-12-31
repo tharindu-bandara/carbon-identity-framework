@@ -7,17 +7,15 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotNull;
 
 @ApiModel(description = "")
-public class ResourceFileDTO {
-
-    private String id = null;
+public class ResourceFileReplaceDTO {
 
     @NotNull
-    private String path = null;
+    private String id = null;
 
     /**
      *
      **/
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("id")
     public String getId() {
 
@@ -29,29 +27,13 @@ public class ResourceFileDTO {
         this.id = id;
     }
 
-    /**
-     *
-     **/
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("path")
-    public String getPath() {
-
-        return path;
-    }
-
-    public void setPath(String path) {
-
-        this.path = path;
-    }
-
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ResourceFileDTO {\n");
+        sb.append("class ResourceFileReplaceDTO {\n");
 
         sb.append("  id: ").append(id).append("\n");
-        sb.append("  path: ").append(path).append("\n");
         sb.append("}\n");
         return sb.toString();
     }
