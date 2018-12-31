@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
 import org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants;
@@ -59,6 +58,8 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_ATTRIBUTE_ALREADY_EXISTS;
+import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_FILES_DOES_NOT_EXISTS;
+import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_FILE_DOES_NOT_EXISTS;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCES_DOES_NOT_EXISTS;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_ALREADY_EXISTS;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_DOES_NOT_EXISTS;
@@ -131,6 +132,7 @@ public class ConfigurationEndpointUtils {
 
         ResourceFileDTO resourceFileDTO = new ResourceFileDTO();
         resourceFileDTO.setPath(resourceFile.getValue());
+        resourceFileDTO.setId(resourceFile.getId());
         return resourceFileDTO;
     }
 
@@ -163,6 +165,7 @@ public class ConfigurationEndpointUtils {
         AttributeDTO attributeDTO = new AttributeDTO();
         attributeDTO.setKey(attribute.getKey());
         attributeDTO.setValue(attribute.getValue());
+        attributeDTO.setId(attribute.getAttributeId());
         return attributeDTO;
     }
 
@@ -223,7 +226,9 @@ public class ConfigurationEndpointUtils {
                 ERROR_CODE_RESOURCE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode()) ||
                 ERROR_CODE_RESOURCES_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode()) ||
                 ERROR_CODE_SEARCH_QUERY_PROPERTY_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode()) ||
-                ERROR_CODE_RESOURCE_TYPE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode());
+                ERROR_CODE_RESOURCE_TYPE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode()) ||
+                ERROR_CODE_FILE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode()) ||
+                ERROR_CODE_FILES_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode());
     }
 
     private static boolean isConflictError(ConfigurationManagementClientException e) {
