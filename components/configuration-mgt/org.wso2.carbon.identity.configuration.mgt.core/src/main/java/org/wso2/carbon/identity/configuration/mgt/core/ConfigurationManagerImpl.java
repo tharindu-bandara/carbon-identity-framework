@@ -32,9 +32,13 @@ import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceFile;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceType;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceTypeAdd;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resources;
+import org.wso2.carbon.identity.configuration.mgt.core.search.ComplexCondition;
 import org.wso2.carbon.identity.configuration.mgt.core.search.Condition;
+import org.wso2.carbon.identity.configuration.mgt.core.search.PrimitiveCondition;
+import org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_ATTRIBUTE_ALREADY_EXISTS;
@@ -55,6 +59,8 @@ import static org.wso2.carbon.identity.configuration.mgt.core.constant.Configura
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_TYPE_DOES_NOT_EXISTS;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_RESOURCE_TYPE_NAME_REQUIRED;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.ErrorMessages.ERROR_CODE_SEARCH_REQUEST_INVALID;
+import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.RESOURCE_SEARCH_BEAN_FIELD_RESOURCE_TYPE_NAME;
+import static org.wso2.carbon.identity.configuration.mgt.core.constant.ConfigurationConstants.RESOURCE_SEARCH_BEAN_FIELD_TENANT_ID;
 import static org.wso2.carbon.identity.configuration.mgt.core.util.ConfigurationUtils.generateUniqueID;
 import static org.wso2.carbon.identity.configuration.mgt.core.util.ConfigurationUtils.getFilePath;
 import static org.wso2.carbon.identity.configuration.mgt.core.util.ConfigurationUtils.handleClientException;
@@ -94,10 +100,12 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
      */
     public Resources getResources() throws ConfigurationManagementException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Not Implemented yet.");
-        }
-        return null;
+        PrimitiveCondition selectCurrentTenant = new PrimitiveCondition(
+                RESOURCE_SEARCH_BEAN_FIELD_TENANT_ID,
+                ConditionType.PrimitiveOperator.EQUALS,
+                getTenantId()
+        );
+        return getTenantResources(selectCurrentTenant);
     }
 
     /**
@@ -105,10 +113,21 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
      */
     public Resources getResourcesByType(String resourceType) throws ConfigurationManagementException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Not Implemented yet.");
-        }
-        return null;
+        List<Condition> searchConditions = new ArrayList<>();
+        searchConditions.add(new PrimitiveCondition(
+                RESOURCE_SEARCH_BEAN_FIELD_TENANT_ID,
+                ConditionType.PrimitiveOperator.EQUALS,
+                getTenantId()
+        ));
+        searchConditions.add(new PrimitiveCondition(
+                RESOURCE_SEARCH_BEAN_FIELD_RESOURCE_TYPE_NAME,
+                ConditionType.PrimitiveOperator.EQUALS,
+                resourceType
+        ));
+        return getTenantResources(new ComplexCondition(
+                ConditionType.ComplexOperator.AND,
+                searchConditions
+        ));
     }
 
     /**

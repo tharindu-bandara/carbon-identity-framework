@@ -88,7 +88,7 @@ public interface ConfigurationManager {
     Resources getResources() throws ConfigurationManagementException;
 
     /**
-     * Get all the resources belongs to the given {@link ResourceType}.
+     * Get all the resources belongs to the given {@link ResourceType} for the current tenant.
      *
      * @param resourceTypeName {@link ResourceType} object name.
      * @return 200 ok. @link Resources} object with all the resources of the given resource type name.

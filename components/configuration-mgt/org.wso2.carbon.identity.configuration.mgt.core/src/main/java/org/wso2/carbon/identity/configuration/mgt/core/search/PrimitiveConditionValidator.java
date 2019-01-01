@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.configuration.mgt.core.search;
 
+import org.apache.commons.lang.ClassUtils;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
 import org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType;
 import org.wso2.carbon.identity.configuration.mgt.core.search.exception.PrimitiveConditionValidationException;
@@ -57,7 +58,7 @@ public class PrimitiveConditionValidator {
         }
         try {
             Field field = this.searchBean.getClass().getDeclaredField(property);
-            if (!field.getType().getName().equals(value.getClass().getName())) {
+            if (!ClassUtils.primitiveToWrapper(field.getType()).getName().equals(value.getClass().getName())) {
                 throw new PrimitiveConditionValidationException(
                         "Value for the property: " + property + " is expected to be: " + field.getType().getName() +
                                 " but found: " + value.getClass().getName()
