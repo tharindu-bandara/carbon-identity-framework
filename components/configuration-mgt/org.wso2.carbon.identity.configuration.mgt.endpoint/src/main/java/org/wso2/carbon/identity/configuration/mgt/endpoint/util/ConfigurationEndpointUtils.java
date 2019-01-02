@@ -88,7 +88,7 @@ public class ConfigurationEndpointUtils {
         resourceDTO.setResourceType(resource.getResourceType());
         resourceDTO.setLastModified(resource.getLastModified());
         resourceDTO.setTenantDomain(resource.getTenantDomain());
-        resourceDTO.setResourceId(resource.getResourceId());
+        resourceDTO.setResourceId(resource.getId());
         resourceDTO.setTenantDomain(resource.getTenantDomain());
         resourceDTO.setAttributes(
                 resource.getAttributes() != null ?
@@ -165,7 +165,7 @@ public class ConfigurationEndpointUtils {
         AttributeDTO attributeDTO = new AttributeDTO();
         attributeDTO.setKey(attribute.getKey());
         attributeDTO.setValue(attribute.getValue());
-        attributeDTO.setId(attribute.getAttributeId());
+        attributeDTO.setId(attribute.getId());
         return attributeDTO;
     }
 

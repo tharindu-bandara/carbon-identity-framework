@@ -24,7 +24,7 @@ public class Attribute {
 
     private String key;
     private String value;
-    private String attributeId;
+    private String id;
 
     /**
      * Initialize an Attribute object with a key,value pair.
@@ -38,25 +38,25 @@ public class Attribute {
         this.value = value;
     }
 
-    public Attribute(String key, String value, String attributeId) {
+    public Attribute(String key, String value, String id) {
 
         this.key = key;
         this.value = value;
-        this.attributeId = attributeId;
+        this.id = id;
     }
 
     public Attribute() {
 
     }
 
-    public String getAttributeId() {
+    public String getId() {
 
-        return attributeId;
+        return id;
     }
 
-    public void setAttributeId(String attributeId) {
+    public void setId(String id) {
 
-        this.attributeId = attributeId;
+        this.id = id;
     }
 
     public String getKey() {

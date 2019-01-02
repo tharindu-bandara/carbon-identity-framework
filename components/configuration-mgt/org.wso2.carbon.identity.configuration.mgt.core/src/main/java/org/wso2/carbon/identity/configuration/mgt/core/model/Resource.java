@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class Resource {
 
-    private String resourceId;
+    private String id;
     private String tenantDomain;
     private String resourceName;
     private String resourceType;
@@ -69,14 +69,14 @@ public class Resource {
         this.hasAttribute = hasAttribute;
     }
 
-    public String getResourceId() {
+    public String getId() {
 
-        return resourceId;
+        return id;
     }
 
-    public void setResourceId(String resourceId) {
+    public void setId(String id) {
 
-        this.resourceId = resourceId;
+        this.id = id;
     }
 
     public String getTenantDomain() {
