@@ -154,6 +154,8 @@ public class ResourceApi {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Ok"),
 
+            @io.swagger.annotations.ApiResponse(code = 201, message = "Successful response"),
+
             @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request"),
 
             @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized"),
@@ -301,6 +303,8 @@ public class ResourceApi {
             "or replace an attribute given by the user.\n", response = AttributeDTO.class)
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Ok"),
+
+            @io.swagger.annotations.ApiResponse(code = 201, message = "Successful response"),
 
             @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request"),
 
