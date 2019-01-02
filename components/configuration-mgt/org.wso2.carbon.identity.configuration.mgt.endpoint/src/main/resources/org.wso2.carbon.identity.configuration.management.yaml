@@ -61,11 +61,11 @@ paths:
         This API is used to search resources across tenants with the given search query. Please refer the
         documentation for the usage.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/api/identity/config-mgt/v1.0/search?$filter=<search-query>" -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
+        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/search?$filter=<search-query>" -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/search?$filter=%28tenantDomain%20eq%20%27carbon.super%27%29%20%20and%20%28resourceTypeName%20eq%20%27e-mail%27%29' -H 'Authorization: Basic YWRtaW46YWRtaW4=' -H "accept: application/json"
+        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/search?$filter=tenantDomain%20eq%20%27carbon.super%27%20%20%20and%20%20resourceTypeName%20eq%20%27e-mail%27%20and%20%28resourceName%20eq%20%27smtp%27%20or%20resourceName%20eq%20%27pop3%27%29' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {"resources":[{"resourceId":"7ff6fa9f-adca-4187-b71f-2c780c644a54","tenantDomain":"carbon.super","resourceName":"smtp","resourceType":"e-mail","lastModified":"2018-12-21 06:01:29","files":[],"attributes":[{"key":"from","value":"3abc.com","attributeId":"fc30371a-b803-48c2-b7cf-bf3233575c7d"},{"key":"to","value":"3wso2.com","attributeId":"2230b85a-ae72-4cfa-8b34-5367790bd5cb"}],"hasFile":false,"hasAttribute":false}]}
+        {"resources":[{"id":"e0dd8199-d45f-49c8-a4ca-6b863d4bc157","tenantDomain":"carbon.super","resourceName":"smtp","resourceType":"e-mail","lastModified":"2019-01-01 18:12:40","files":[{"value":"/resource/file/489684c4-77ee-47e0-ad74-38ccb0762672","id":"489684c4-77ee-47e0-ad74-38ccb0762672"}],"attributes":[{"key":"from","value":"hey","id":"de983448-8700-4fde-8a4b-f0becdb7ebe1"},{"key":"to","value":"3wso2.com","id":"4b4c5c85-dbed-46cb-b576-e15de4acc76a"}],"hasFile":true,"hasAttribute":true},{"id":"4f731dc0-1581-4f00-b904-3d42bebdc9b6","tenantDomain":"carbon.super","resourceName":"pop3","resourceType":"e-mail","lastModified":"2019-01-01 18:28:33","files":[],"attributes":[{"key":"server","value":"pop3.abc.com","id":"6f7aa9ee-2bca-4813-8405-9a5ea8728e2f"},{"key":"to","value":"wso2.com","id":"7569948c-9aed-451c-af4c-64c943e85c91"}],"hasFile":false,"hasAttribute":true}]}
       summary: |
         Retrieve tenant resources based on search parameters.
       responses:
@@ -94,11 +94,11 @@ paths:
       description: |
         This API is used to create a new resource type.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/api/identity/config-mgt/v1.0/search?$filter=<search-query>" -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
+        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type" -H "accept: application/json" -H "Content-Type: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>" -d "{ \"name\": \"string\", \"description\": \"string\"}""
       x-wso2-curl: |
-        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/search?$filter=%28tenantDomain%20eq%20%27carbon.super%27%29%20%20and%20%28resourceTypeName%20eq%20%27e-mail%27%29' -H 'Authorization: Basic YWRtaW46YWRtaW4=' -H "accept: application/json"
+        curl -k -X POST https://localhost:9443/api/identity/config-mgt/v1.0/resource-type -H "accept: application/json" -H 'Content-Type: application/json' -H 'Authorization: Basic YWRtaW46YWRtaW4=' -d '{"name": "e-mail", "description": "This is the resource type for email resources."}'
       x-wso2-response: |
-        {"resources":[{"resourceId":"7ff6fa9f-adca-4187-b71f-2c780c644a54","tenantDomain":"carbon.super","resourceName":"smtp","resourceType":"e-mail","lastModified":"2018-12-21 06:01:29","files":[],"attributes":[{"key":"from","value":"3abc.com","attributeId":"fc30371a-b803-48c2-b7cf-bf3233575c7d"},{"key":"to","value":"3wso2.com","attributeId":"2230b85a-ae72-4cfa-8b34-5367790bd5cb"}],"hasFile":false,"hasAttribute":false}]}
+        {"name":"e-mail","id":"0adbdfad-5f4f-4c11-af75-9ed3e93647b9","description":"This is the resource type for email resources."}
       summary: |
         Create the resource type.
       parameters:
@@ -135,12 +135,11 @@ paths:
       description: |
         This API is used to create or replace a new resource type.
       x-wso2-request: |
-        curl -k -X PUT "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type" -H "Authorization: Basic
-              <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n  \"name\": \"string\",\n  \"description\": \"string\"\n}"
+        curl -k -X PUT "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type" -H "accept: application/json" -H "Content-Type: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>" -d "{ \"name\": \"string\", \"description\": \"string\"}""
       x-wso2-curl: |
-        curl -k -X PUT "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n  \"name\": \"e-mail\",\n  \"description\": \"This is the resource type for email resources.\"\n}"
+        curl -k -X PUT https://localhost:9443/api/identity/config-mgt/v1.0/resource-type -H "accept: application/json" -H 'Content-Type: application/json' -H 'Authorization: Basic YWRtaW46YWRtaW4=' -d '{"name": "e-mail", "description": "This is the resource type for email resources."}'
       x-wso2-response: |
-        {\n    \"name\": \"e-mail\",\n    \"id\": \"2700105f-1152-44a1-8d6d-8bef577ad768\",\n    \"description\": \"This is the resource type for email resources.\"\n}
+        {"name":"e-mail","id":"0adbdfad-5f4f-4c11-af75-9ed3e93647b9","description":"This is the resource type for email resources."}
       summary: |
         Create or replace the resource type.
       parameters:
@@ -151,47 +150,10 @@ paths:
           schema:
             $ref: '#/definitions/ResourceTypeAdd'
       responses:
-        200:
-          description: Ok
+        201:
+          description: Successful response
           schema:
             $ref: '#/definitions/ResourceType'
-        400:
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
-        409:
-          description: Conflict
-          schema:
-            $ref: '#/definitions/Error'
-        500:
-          description: Server Error
-          schema:
-            $ref: '#/definitions/Error'
-      tags:
-        - Resource Type
-    patch:
-      description: |
-        This API is used to update an existing resource type.
-      x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"<Service_Name>\", \"tenantDomain\": \"<Tenant_Domain_Name>\", \"purposes\": [ { \"purposeId\": <Purpose_ID>, \"purposeCategoryId\": [ <Purpose_Category_ID> ], \"consentType\": \"<Consent_Type>\", \"piiCategory\": [ { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" }, { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" } ], \"primaryPurpose\": true, \"termination\": \"days:<Number_Of_Days>\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"<Collection_Method>\", \"jurisdiction\": \"<Jurisdiction>\", \"language\": \"<Language_Abbreviation>\", \"policyURL\": \"<Service_Policy_URL>", \"properties\": [ { \"key\": \"<PII_Controller's_Public_Key>\", \"value\": \"v1\" } ]}"
-      x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"foo-service\", \"tenantDomain\": \"carbon.super\", \"purposes\": [ { \"purposeId\": 1, \"purposeCategoryId\": [ 1 ], \"consentType\": \"EXPLICIT\", \"piiCategory\": [ { \"piiCategoryId\": 1, \"validity\": \"days:30\" }, { \"piiCategoryId\": 2, \"validity\": \"days:30\" } ], \"primaryPurpose\": true, \"termination\": \"days:30\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"Sign-Up\", \"jurisdiction\": \"CA\", \"language\": \"EN\", \"policyURL\": \"https://foo.com/privacy\", \"properties\": [ { \"key\": \"k1\", \"value\": \"v1\" } ]}"
-      x-wso2-response: |
-        {"consentReceiptId":"38279263-f385-4252-8966-40998faa95ae","collectionMethod":"Sign-Up","language":"EN","piiPrincipalId":"admin","tenantDomain":"carbon.super"}
-      summary: |
-        Update existing resource type.
-      parameters:
-        - name: type
-          in: body
-          description: This represents the resource type to update the existing.
-          required: true
-          schema:
-            $ref: '#/definitions/ResourceTypeAdd'
-      responses:
         200:
           description: Ok
           schema:
@@ -220,13 +182,11 @@ paths:
       description: |
         This API is used to get an existing resource type.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type/<resource-type-name>" -H
-              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type/{resource-type-name} -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type/e-mail" -H
-              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/resource-type/e-mail' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {\n    \"name\": \"e-mail\",\n    \"id\": \"2700105f-1152-44a1-8d6d-8bef577ad768\",\n    \"description\": \"This is the resource type for email resources.\"\n}
+        {"name":"e-mail","id":"0adbdfad-5f4f-4c11-af75-9ed3e93647b9","description":"This is the resource type for email resources."}
       summary: |
         Get the resource type.
       parameters:
@@ -262,11 +222,9 @@ paths:
       description: |
         This API is used to delete an existing resource type.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type/<resource-type-name>" -H
-              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X DELETE "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type/{resource-type-name} -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource-type/e-mail" -H
-              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X DELETE 'https://localhost:9443/api/identity/config-mgt/v1.0/resource-type/e-mail' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
         HTTP/1.1 200 Ok
       summary: |
@@ -305,11 +263,11 @@ paths:
       description: |
         This API is used to retrieve resources.
       x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"<Service_Name>\", \"tenantDomain\": \"<Tenant_Domain_Name>\", \"purposes\": [ { \"purposeId\": <Purpose_ID>, \"purposeCategoryId\": [ <Purpose_Category_ID> ], \"consentType\": \"<Consent_Type>\", \"piiCategory\": [ { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" }, { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" } ], \"primaryPurpose\": true, \"termination\": \"days:<Number_Of_Days>\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"<Collection_Method>\", \"jurisdiction\": \"<Jurisdiction>\", \"language\": \"<Language_Abbreviation>\", \"policyURL\": \"<Service_Policy_URL>", \"properties\": [ { \"key\": \"<PII_Controller's_Public_Key>\", \"value\": \"v1\" } ]}"
+        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"foo-service\", \"tenantDomain\": \"carbon.super\", \"purposes\": [ { \"purposeId\": 1, \"purposeCategoryId\": [ 1 ], \"consentType\": \"EXPLICIT\", \"piiCategory\": [ { \"piiCategoryId\": 1, \"validity\": \"days:30\" }, { \"piiCategoryId\": 2, \"validity\": \"days:30\" } ], \"primaryPurpose\": true, \"termination\": \"days:30\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"Sign-Up\", \"jurisdiction\": \"CA\", \"language\": \"EN\", \"policyURL\": \"https://foo.com/privacy\", \"properties\": [ { \"key\": \"k1\", \"value\": \"v1\" } ]}"
+        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/resource' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {"consentReceiptId":"38279263-f385-4252-8966-40998faa95ae","collectionMethod":"Sign-Up","language":"EN","piiPrincipalId":"admin","tenantDomain":"carbon.super"}
+        {"resources":[{"resourceId":"693c9f31-40b7-444d-8967-c8091c0e882c","tenantDomain":"carbon.super","resourceName":"email","resourceType":"e-mail-1","lastModified":"2018-12-20 10:17:32","attributes":[{"id":"3fba1375-9ca2-415a-b8e0-87234516f6d0","key":"from","value":"hey"},{"id":"50003862-116f-4754-b939-84c86c45ac5d","key":"to","value":"3wso2.com"}],"files":[]},{"resourceId":"a01dd245-8014-4207-b5ad-371008f9adfc","tenantDomain":"carbon.super","resourceName":"smtp","resourceType":"e-mail-1","lastModified":"2018-12-20 12:30:43","attributes":[{"id":"a68cddf3-424f-4842-926c-4286797d3f18","key":"from","value":"3abc.com"},{"id":"cb6483c2-47ac-4acf-8ec0-a4f1d73fcc40","key":"to","value":"3wso2.com"}],"files":[]}]}
       summary: |
         Retrieve resources.
       responses:
@@ -339,16 +297,11 @@ paths:
       description: |
         This API is used to retrieve a file.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-              .0/resource/<resource-type>/<resource-name>/<attribute-key>" -H "Authorization: Basic
-              <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource/file/{file-id} -H "accept: application/octet-stream" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp/from" -H
-                    "Authorization:
-                    Basic
-                    YWRtaW46YWRtaW4=" -H "accept: application/json"
+        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/resource/file/8ba77346-2cf6-4b03-8dcd-12fbfe17d8cf' -H "accept: application/octet-stream" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {"consentReceiptId":"38279263-f385-4252-8966-40998faa95ae","collectionMethod":"Sign-Up","language":"EN","piiPrincipalId":"admin","tenantDomain":"carbon.super"}
+        Hello World!
       summary: |
         Retrieve the file.
       parameters:
@@ -380,11 +333,11 @@ paths:
       description: |
         This API is used to revoke a file in the tenant domain given by the user.
       x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"<Service_Name>\", \"tenantDomain\": \"<Tenant_Domain_Name>\", \"purposes\": [ { \"purposeId\": <Purpose_ID>, \"purposeCategoryId\": [ <Purpose_Category_ID> ], \"consentType\": \"<Consent_Type>\", \"piiCategory\": [ { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" }, { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" } ], \"primaryPurpose\": true, \"termination\": \"days:<Number_Of_Days>\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"<Collection_Method>\", \"jurisdiction\": \"<Jurisdiction>\", \"language\": \"<Language_Abbreviation>\", \"policyURL\": \"<Service_Policy_URL>", \"properties\": [ { \"key\": \"<PII_Controller's_Public_Key>\", \"value\": \"v1\" } ]}"
+        curl -k -X DELETE "https://localhost:9443/api/identity/config-mgt/v1.0/resource/file/{file-id} -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"foo-service\", \"tenantDomain\": \"carbon.super\", \"purposes\": [ { \"purposeId\": 1, \"purposeCategoryId\": [ 1 ], \"consentType\": \"EXPLICIT\", \"piiCategory\": [ { \"piiCategoryId\": 1, \"validity\": \"days:30\" }, { \"piiCategoryId\": 2, \"validity\": \"days:30\" } ], \"primaryPurpose\": true, \"termination\": \"days:30\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"Sign-Up\", \"jurisdiction\": \"CA\", \"language\": \"EN\", \"policyURL\": \"https://foo.com/privacy\", \"properties\": [ { \"key\": \"k1\", \"value\": \"v1\" } ]}"
+        curl -k -X DELETE 'https://localhost:9443/api/identity/config-mgt/v1.0/resource/file/8ba77346-2cf6-4b03-8dcd-12fbfe17d8cf' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {"consentReceiptId":"38279263-f385-4252-8966-40998faa95ae","collectionMethod":"Sign-Up","language":"EN","piiPrincipalId":"admin","tenantDomain":"carbon.super"}
+        HTTP/1.1 200 Ok
       summary: |
         Revoke the file
       parameters:
@@ -420,11 +373,11 @@ paths:
       description: |
         This API is used to retrieve all the resources for a given resource type.
       x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"<Service_Name>\", \"tenantDomain\": \"<Tenant_Domain_Name>\", \"purposes\": [ { \"purposeId\": <Purpose_ID>, \"purposeCategoryId\": [ <Purpose_Category_ID> ], \"consentType\": \"<Consent_Type>\", \"piiCategory\": [ { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" }, { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" } ], \"primaryPurpose\": true, \"termination\": \"days:<Number_Of_Days>\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"<Collection_Method>\", \"jurisdiction\": \"<Jurisdiction>\", \"language\": \"<Language_Abbreviation>\", \"policyURL\": \"<Service_Policy_URL>", \"properties\": [ { \"key\": \"<PII_Controller's_Public_Key>\", \"value\": \"v1\" } ]}"
+        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource/resource-type/{resource-type-name} -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"foo-service\", \"tenantDomain\": \"carbon.super\", \"purposes\": [ { \"purposeId\": 1, \"purposeCategoryId\": [ 1 ], \"consentType\": \"EXPLICIT\", \"piiCategory\": [ { \"piiCategoryId\": 1, \"validity\": \"days:30\" }, { \"piiCategoryId\": 2, \"validity\": \"days:30\" } ], \"primaryPurpose\": true, \"termination\": \"days:30\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"Sign-Up\", \"jurisdiction\": \"CA\", \"language\": \"EN\", \"policyURL\": \"https://foo.com/privacy\", \"properties\": [ { \"key\": \"k1\", \"value\": \"v1\" } ]}"
+        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/resource/resource-type/e-mail' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {"consentReceiptId":"38279263-f385-4252-8966-40998faa95ae","collectionMethod":"Sign-Up","language":"EN","piiPrincipalId":"admin","tenantDomain":"carbon.super"}
+        {"resources":[{"resourceId":"a01dd245-8014-4207-b5ad-371008f9adfc","tenantDomain":"carbon.super","resourceName":"smtp","resourceType":"e-mail-1","lastModified":"2019-01-01 19:14:38","attributes":[{"id":"a68cddf3-424f-4842-926c-4286797d3f18","key":"from","value":"3abc.com"},{"id":"cb6483c2-47ac-4acf-8ec0-a4f1d73fcc40","key":"to","value":"3wso2.com"}],"files":[{"id":"c660d5bc-d7ae-4cf9-9979-f66ef66617c0","path":"/resource/file/c660d5bc-d7ae-4cf9-9979-f66ef66617c0"}]}]}
       summary: |
         Retrieve all the resources for the given resource type.
       parameters:
@@ -458,12 +411,11 @@ paths:
       description: |
         This API is used to store the resource given by the user.
       x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/<resource-type>" -H
-              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n  \"name\": \"string\",\n  \"attributes\": [\n    {\n      \"key\": \"string\",\n      \"value\": \"string\"\n    }\n  ]\n}"
+        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}" -H "accept: application/json" -H "Content-Type: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>" -d '{"name": "string","attributes": [{"id": "string","key": "string","value": "string"}]}'
       x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n  \"name\": \"smtp\",\n  \"attributes\": [\n    {\n      \"key\": \"from\",\n      \"value\": \"3abc.com\"\n    },\n    {\n      \"key\": \"to\",\n      \"value\": \"3wso2.com\"\n    }\n  ]\n}"
+        curl -k -X POST https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail -H "accept: application/json" -H 'Content-Type: application/json' -H 'Authorization: Basic YWRtaW46YWRtaW4=' -d '{"name": "smtp","attributes": [{"key": "from","value": "3abc.com"},{"key": "to","value": "3wso2.com"}]}'
       x-wso2-response: |
-        {\n    \"resourceId\": \"a01dd245-8014-4207-b5ad-371008f9adfc\",\n    \"tenantDomain\": \"carbon.super\",\n    \"resourceName\": \"smtp\",\n    \"resourceType\": \"e-mail-1\",\n    \"lastModified\": \"2018-12-20T12:30:42.620Z\",\n    \"attributes\": [\n        {\n            \"key\": \"from\",\n            \"value\": \"3abc.com\"\n        },\n        {\n            \"key\": \"to\",\n            \"value\": \"3wso2.com\"\n        }\n    ],\n    \"files\": []\n}
+        {"resourceId":"7060b0c6-000b-47ed-86ef-396ff5cb8203","tenantDomain":"carbon.super","resourceName":"smtp","resourceType":"e-mail","lastModified":"2019-01-01T19:40:21.585Z","attributes":[{"id":null,"key":"from","value":"3abc.com"},{"id":null,"key":"to","value":"3wso2.com"}],"files":[]}
       summary: |
         Create the resource
       # post parameters:
@@ -506,12 +458,11 @@ paths:
       description: |
         This API is used to store or replace the resource given by the user.
       x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/<resource-type>" -H
-              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n  \"name\": \"string\",\n  \"attributes\": [\n    {\n      \"key\": \"string\",\n      \"value\": \"string\"\n    }\n  ]\n}"
+        curl -k -X PUT "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}" -H "accept: application/json" -H "Content-Type: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>" -d '{"name": "string","attributes": [{"id": "string","key": "string","value": "string"}]}'
       x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n  \"name\": \"smtp\",\n  \"attributes\": [\n    {\n      \"key\": \"from\",\n      \"value\": \"3abc.com\"\n    },\n    {\n      \"key\": \"to\",\n      \"value\": \"3wso2.com\"\n    }\n  ]\n}"
+        curl -k -X PUT https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail -H "accept: application/json" -H 'Content-Type: application/json' -H 'Authorization: Basic YWRtaW46YWRtaW4=' -d '{"name": "smtp","attributes": [{"key": "from","value": "3abc.com"},{"key": "to","value": "3wso2.com"}]}'
       x-wso2-response: |
-        {\n    \"resourceId\": \"a01dd245-8014-4207-b5ad-371008f9adfc\",\n    \"tenantDomain\": \"carbon.super\",\n    \"resourceName\": \"smtp\",\n    \"resourceType\": \"e-mail-1\",\n    \"lastModified\": \"2018-12-20T12:30:42.620Z\",\n    \"attributes\": [\n        {\n            \"key\": \"from\",\n            \"value\": \"3abc.com\"\n        },\n        {\n            \"key\": \"to\",\n            \"value\": \"3wso2.com\"\n        }\n    ],\n    \"files\": []\n}
+        {"resourceId":"7060b0c6-000b-47ed-86ef-396ff5cb8203","tenantDomain":"carbon.super","resourceName":"smtp","resourceType":"e-mail","lastModified":"2019-01-01T19:40:21.585Z","attributes":[{"id":null,"key":"from","value":"3abc.com"},{"id":null,"key":"to","value":"3wso2.com"}],"files":[]}
       summary: |
         Add or Replace the resource
       # put parameters:
@@ -528,6 +479,10 @@ paths:
           schema:
             $ref: '#/definitions/ResourceAdd'
       responses:
+        201:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Resource'
         200:
           description: Ok
           schema:
@@ -538,53 +493,6 @@ paths:
             $ref: '#/definitions/Error'
         401:
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
-        500:
-          description: Server Error
-          schema:
-            $ref: '#/definitions/Error'
-      tags:
-        - Resource
-    patch:
-      description: |
-        This API is used to update an existing resource given by the user.
-      x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"<Service_Name>\", \"tenantDomain\": \"<Tenant_Domain_Name>\", \"purposes\": [ { \"purposeId\": <Purpose_ID>, \"purposeCategoryId\": [ <Purpose_Category_ID> ], \"consentType\": \"<Consent_Type>\", \"piiCategory\": [ { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" }, { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" } ], \"primaryPurpose\": true, \"termination\": \"days:<Number_Of_Days>\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"<Collection_Method>\", \"jurisdiction\": \"<Jurisdiction>\", \"language\": \"<Language_Abbreviation>\", \"policyURL\": \"<Service_Policy_URL>", \"properties\": [ { \"key\": \"<PII_Controller's_Public_Key>\", \"value\": \"v1\" } ]}"
-      x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"foo-service\", \"tenantDomain\": \"carbon.super\", \"purposes\": [ { \"purposeId\": 1, \"purposeCategoryId\": [ 1 ], \"consentType\": \"EXPLICIT\", \"piiCategory\": [ { \"piiCategoryId\": 1, \"validity\": \"days:30\" }, { \"piiCategoryId\": 2, \"validity\": \"days:30\" } ], \"primaryPurpose\": true, \"termination\": \"days:30\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"Sign-Up\", \"jurisdiction\": \"CA\", \"language\": \"EN\", \"policyURL\": \"https://foo.com/privacy\", \"properties\": [ { \"key\": \"k1\", \"value\": \"v1\" } ]}"
-      x-wso2-response: |
-        {"consentReceiptId":"38279263-f385-4252-8966-40998faa95ae","collectionMethod":"Sign-Up","language":"EN","piiPrincipalId":"admin","tenantDomain":"carbon.super"}
-      summary: |
-        Update existing resource
-      # patch parameters:
-      parameters:
-        - name: resource-type
-          in: path
-          description:  This represents the type of the resource to be added and can either be the name or id.
-          required: true
-          type: 'string'
-        - name: resource
-          in: body
-          description:  This represents the resource that needs to be updated.
-          required: true
-          schema:
-            $ref: '#/definitions/ResourceAdd'
-      responses:
-        200:
-          description: Ok
-          schema:
-            $ref: '#/definitions/Resource'
-        400:
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
-        404:
-          description: Not Found
           schema:
             $ref: '#/definitions/Error'
         500:
@@ -599,15 +507,11 @@ paths:
       description: |
         This API is used to retrieve a resource.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-              .0/resource/<resource-type>/<resource-name>" -H
-                      "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}/{resource-name} -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-                      .0/resource/email/smtp" -H
-                              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {\n    \"resourceId\": \"dea08fd5-9a8c-4956-990f-3921819eecdf\",\n    \"tenantDomain\": \"carbon.super\",\n    \"resourceName\": \"smtp\",\n    \"resourceType\": \"e-mail\",\n    \"lastModified\": \"2018-12-20 12:36:23\",\n    \"attributes\": [\n        {\n            \"key\": \"from\",\n            \"value\": \"3abc.com\"\n        },\n        {\n            \"key\": \"to\",\n            \"value\": \"3wso2.com\"\n        }\n    ],\n    \"files\": []\n}
+        {"resourceId":"7060b0c6-000b-47ed-86ef-396ff5cb8203","tenantDomain":"carbon.super","resourceName":"smtp","resourceType":"e-mail","lastModified":"2019-01-01 19:40:22","attributes":[{"id":"463e5d5b-6362-43f8-96a0-e19343896841","key":"from","value":"3abc.com"},{"id":"a83f1575-b996-4889-9363-16ce295a19be","key":"to","value":"3wso2.com"}],"files":[]}
       summary: |
         Retrieve the resource.
       parameters:
@@ -644,13 +548,9 @@ paths:
       description: |
         This API is used to revoke a resource in the tenant domain given by the user.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-              .0/resource/<resource-type>/<resource-name>" -H
-                      "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X DELETE "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}/{resource-name} -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-                      .0/resource/email/smtp" -H
-                              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X DELETE 'https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
         HTTP/1.1 200 Ok
       summary: |
@@ -693,13 +593,11 @@ paths:
       description: |
         This API is used to store an attribute given by the user.
       x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/<resource-type>/<resource-name>"
-               -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n  \"key\": \"string\",\n  \"value\": \"string\"\n}"
+        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}/{resource-name}/attribute" -H "accept: application/json" -H "Content-Type: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>" -d "{"key": "string","value": "string"}""
       x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp" -H "Authorization:
-                    Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n    \"key\": \"from\",\n    \"value\": \"hey\"\n}"
+        curl -k -X POST https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp/attribute -H "accept: application/json" -H 'Content-Type: application/json' -H 'Authorization: Basic YWRtaW46YWRtaW4=' -d '{"key": "from", "description": "abc.com"}'
       x-wso2-response: |
-        {\n    \"key\": \"from\",\n    \"value\": \"hey\"\n}
+        {"id": "42c8d3f1-48f9-40e7-98e2-2b6376731fc0","key": "from","value": "abc.com"}
       summary: |
         Create an attribute
       # post parameters:
@@ -747,13 +645,12 @@ paths:
         This API is used to store or replace an attribute given by the user.
       x-wso2-request: |
         curl -k -X PUT "https://localhost:9443/api/identity/config-mgt/v1
-        .0/resource/<resource-type>/<resource-name>"
-               -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n  \"key\": \"string\",\n  \"value\": \"string\"\n}"
+        .0/resource/{resource-type}/{resource-name}/attribute" -H "accept: application/json" -H "Content-Type: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>" -d "{"key": "string","value": "string"}""
       x-wso2-curl: |
-        curl -k -X PUT "https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp" -H "Authorization:
-                    Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n    \"key\": \"from\",\n    \"value\": \"hey\"\n}"
+        curl -k -X PUT https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp/attribute -H "accept:
+        application/json" -H 'Content-Type: application/json' -H 'Authorization: Basic YWRtaW46YWRtaW4=' -d '{"key": "from", "description": "abc.com"}'
       x-wso2-response: |
-        {\n    \"key\": \"from\",\n    \"value\": \"hey\"\n}
+        {"id": "42c8d3f1-48f9-40e7-98e2-2b6376731fc0","key": "from","value": "abc.com"}
       summary: |
         Add or Replace an attribute
       # put parameters:
@@ -775,6 +672,10 @@ paths:
           schema:
             $ref: '#/definitions/Attribute'
       responses:
+        201:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Attribute'
         200:
           description: Ok
           schema:
@@ -785,58 +686,6 @@ paths:
             $ref: '#/definitions/Error'
         401:
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
-        500:
-          description: Server Error
-          schema:
-            $ref: '#/definitions/Error'
-      tags:
-        - Attribute
-    patch:
-      description: |
-        This API is used to update an existing attribute given by the user.
-      x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"<Service_Name>\", \"tenantDomain\": \"<Tenant_Domain_Name>\", \"purposes\": [ { \"purposeId\": <Purpose_ID>, \"purposeCategoryId\": [ <Purpose_Category_ID> ], \"consentType\": \"<Consent_Type>\", \"piiCategory\": [ { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" }, { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" } ], \"primaryPurpose\": true, \"termination\": \"days:<Number_Of_Days>\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"<Collection_Method>\", \"jurisdiction\": \"<Jurisdiction>\", \"language\": \"<Language_Abbreviation>\", \"policyURL\": \"<Service_Policy_URL>", \"properties\": [ { \"key\": \"<PII_Controller's_Public_Key>\", \"value\": \"v1\" } ]}"
-      x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"foo-service\", \"tenantDomain\": \"carbon.super\", \"purposes\": [ { \"purposeId\": 1, \"purposeCategoryId\": [ 1 ], \"consentType\": \"EXPLICIT\", \"piiCategory\": [ { \"piiCategoryId\": 1, \"validity\": \"days:30\" }, { \"piiCategoryId\": 2, \"validity\": \"days:30\" } ], \"primaryPurpose\": true, \"termination\": \"days:30\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"Sign-Up\", \"jurisdiction\": \"CA\", \"language\": \"EN\", \"policyURL\": \"https://foo.com/privacy\", \"properties\": [ { \"key\": \"k1\", \"value\": \"v1\" } ]}"
-      x-wso2-response: |
-        {"consentReceiptId":"38279263-f385-4252-8966-40998faa95ae","collectionMethod":"Sign-Up","language":"EN","piiPrincipalId":"admin","tenantDomain":"carbon.super"}
-      summary: |
-        Update existing attribute
-      # patch parameters:
-      parameters:
-        - name: resource-name
-          in: path
-          description:  This represents the name of the attribute to be added or updated.
-          required: true
-          type: 'string'
-        - name: resource-type
-          in: path
-          description:  This represents the type of the attribute to be added or updated and can either be the name or id.
-          required: true
-          type: 'string'
-        - name: attribute
-          in: body
-          description:  This represents the corresponding attribute value that needs to be added or updated.
-          required: true
-          schema:
-            $ref: '#/definitions/Attribute'
-      responses:
-        200:
-          description: Ok
-          schema:
-            $ref: '#/definitions/Attribute'
-        400:
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
-        404:
-          description: Not Found
           schema:
             $ref: '#/definitions/Error'
         500:
@@ -853,13 +702,11 @@ paths:
       description: |
         This API is used to store a file given by the user.
       x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/<resource-type>/<resource-name>"
-               -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n  \"key\": \"string\",\n  \"value\": \"string\"\n}"
+        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}/{resource-name}/file" -H "accept: application/json" -H "Content-Type: multipart/form-data" -H "Authorization: Basic <Base64Encoded[username:password]>"  -F "resourceFile={file-path}""
       x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp" -H "Authorization:
-                    Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\n    \"key\": \"from\",\n    \"value\": \"hey\"\n}"
+        curl -k -X POST https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp/file -H "accept: application/json" -H "Content-Type: multipart/form-data" -H 'Authorization: Basic YWRtaW46YWRtaW4='  -F "resourceFile=@/test.txt"'
       x-wso2-response: |
-        {\n    \"key\": \"from\",\n    \"value\": \"hey\"\n}
+        {"id":"9921a2ac-058c-4aeb-a8f2-e126d80dbe88","path":"/resource/file/7060b0c6-000b-47ed-86ef-396ff5cb8203"}
       summary: |
         Create a file
       # post parameters:
@@ -906,15 +753,11 @@ paths:
       description: |
         This API is used to retrieve all the files for the resource.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-              .0/resource/<resource-type>/<resource-name>" -H
-                      "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}/{resource-name}/file" -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-                      .0/resource/email/smtp" -H
-                              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp/file' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {\n    \"resourceId\": \"dea08fd5-9a8c-4956-990f-3921819eecdf\",\n    \"tenantDomain\": \"carbon.super\",\n    \"resourceName\": \"smtp\",\n    \"resourceType\": \"e-mail\",\n    \"lastModified\": \"2018-12-20 12:36:23\",\n    \"attributes\": [\n        {\n            \"key\": \"from\",\n            \"value\": \"3abc.com\"\n        },\n        {\n            \"key\": \"to\",\n            \"value\": \"3wso2.com\"\n        }\n    ],\n    \"files\": []\n}
+        [{"id":"0e032695-f24e-4559-8ac5-bd51be07b250","path":"/resource/file/0e032695-f24e-4559-8ac5-bd51be07b250"},{"id":"215ec2ab-b186-45ef-8278-fc3f9999598d","path":"/resource/file/215ec2ab-b186-45ef-8278-fc3f9999598d"},{"id":"685f3edc-4dc9-4a4f-a4d7-7c3252cb621a","path":"/resource/file/685f3edc-4dc9-4a4f-a4d7-7c3252cb621a"},{"id":"9921a2ac-058c-4aeb-a8f2-e126d80dbe88","path":"/resource/file/9921a2ac-058c-4aeb-a8f2-e126d80dbe88"},{"id":"9e06ff53-1cd7-4b65-86e1-1ff4063a78a7","path":"/resource/file/9e06ff53-1cd7-4b65-86e1-1ff4063a78a7"}]
       summary: |
         Retrieve all the files for the resource.
       parameters:
@@ -953,13 +796,9 @@ paths:
       description: |
         This API is used to revoke all the files for the resource.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-              .0/resource/<resource-type>/<resource-name>" -H
-                      "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X DELETE "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}/{resource-name}/file" -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-                      .0/resource/email/smtp" -H
-                              "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X DELETE 'https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp/file' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
         HTTP/1.1 200 Ok
       summary: |
@@ -1002,16 +841,11 @@ paths:
       description: |
         This API is used to retrieve a attribute.
       x-wso2-request: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1
-              .0/resource/<resource-type>/<resource-name>/<attribute-key>" -H "Authorization: Basic
-              <Base64Encoded[username:password]>" -H "accept: application/json"
+        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}/{resource-name}/attribute/{attribute-key}" -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X GET "https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp/from" -H
-                    "Authorization:
-                    Basic
-                    YWRtaW46YWRtaW4=" -H "accept: application/json"
+        curl -k -X GET 'https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp/attribute/from' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {"consentReceiptId":"38279263-f385-4252-8966-40998faa95ae","collectionMethod":"Sign-Up","language":"EN","piiPrincipalId":"admin","tenantDomain":"carbon.super"}
+        {"id":"42c8d3f1-48f9-40e7-98e2-2b6376731fc0","key":"from","value":"123.com"}
       summary: |
         Retrieve the attribute.
       parameters:
@@ -1053,11 +887,11 @@ paths:
       description: |
         This API is used to revoke a attribute in the tenant domain given by the user.
       x-wso2-request: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic <Base64Encoded[username:password]>" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"<Service_Name>\", \"tenantDomain\": \"<Tenant_Domain_Name>\", \"purposes\": [ { \"purposeId\": <Purpose_ID>, \"purposeCategoryId\": [ <Purpose_Category_ID> ], \"consentType\": \"<Consent_Type>\", \"piiCategory\": [ { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" }, { \"piiCategoryId\": <PII_Category_ID>, \"validity\": \"days:<Number_Of_Days>\" } ], \"primaryPurpose\": true, \"termination\": \"days:<Number_Of_Days>\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"<Collection_Method>\", \"jurisdiction\": \"<Jurisdiction>\", \"language\": \"<Language_Abbreviation>\", \"policyURL\": \"<Service_Policy_URL>", \"properties\": [ { \"key\": \"<PII_Controller's_Public_Key>\", \"value\": \"v1\" } ]}"
+        curl -k -X DELETE "https://localhost:9443/api/identity/config-mgt/v1.0/resource/{resource-type}/{resource-name}/attribute/{attribute-key} -H "accept: application/json" -H "Authorization: Basic <Base64Encoded[username:password]>"
       x-wso2-curl: |
-        curl -k -X POST "https://localhost:9443/api/identity/config-mgt/v1.0/consents" -H "Authorization: Basic YWRtaW46YWRtaW4=" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"services\": [ { \"service\": \"foo-service\", \"tenantDomain\": \"carbon.super\", \"purposes\": [ { \"purposeId\": 1, \"purposeCategoryId\": [ 1 ], \"consentType\": \"EXPLICIT\", \"piiCategory\": [ { \"piiCategoryId\": 1, \"validity\": \"days:30\" }, { \"piiCategoryId\": 2, \"validity\": \"days:30\" } ], \"primaryPurpose\": true, \"termination\": \"days:30\", \"thirdPartyDisclosure\": false, \"thirdPartyName\": \"\" } ] } ], \"collectionMethod\": \"Sign-Up\", \"jurisdiction\": \"CA\", \"language\": \"EN\", \"policyURL\": \"https://foo.com/privacy\", \"properties\": [ { \"key\": \"k1\", \"value\": \"v1\" } ]}"
+        curl -k -X DELETE 'https://localhost:9443/api/identity/config-mgt/v1.0/resource/e-mail/smtp/attribute/from' -H "accept: application/json" -H 'Authorization: Basic YWRtaW46YWRtaW4='
       x-wso2-response: |
-        {"consentReceiptId":"38279263-f385-4252-8966-40998faa95ae","collectionMethod":"Sign-Up","language":"EN","piiPrincipalId":"admin","tenantDomain":"carbon.super"}
+        HTTP/1.1 200 Ok
       summary: |
         Revoke the attribute
       parameters:
