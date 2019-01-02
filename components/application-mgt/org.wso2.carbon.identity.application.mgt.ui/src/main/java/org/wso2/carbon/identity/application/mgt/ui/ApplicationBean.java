@@ -1120,8 +1120,8 @@ public class ApplicationBean {
         String jwks = request.getParameter("jwksUri");
         boolean jwksExist = false;
         ServiceProviderProperty propertyForJWKS = new ServiceProviderProperty();
-        //adding jwks uri as a sp meta data
-        ArrayList<ServiceProviderProperty> spPropList = new ArrayList<>(Arrays.asList(serviceProvider.getSpProperties()));
+        // Adding jwks uri as a sp meta data
+        ArrayList<ServiceProviderProperty> spPropList = getServiceProviderProperties();
 
         //if a jwks property already exist for the service provider check whether the stored value is not  equal to the
         //value recieved from the request
@@ -1742,5 +1742,15 @@ public class ApplicationBean {
             return serviceProvider.getLocalAndOutBoundAuthenticationConfig().getUseUserstoreDomainInRoles();
         }
         return false;
+    }
+
+    private ArrayList<ServiceProviderProperty> getServiceProviderProperties() {
+        ArrayList<ServiceProviderProperty> spPropList;
+        if (serviceProvider.getSpProperties() != null) {
+            spPropList = new ArrayList<>(Arrays.asList(serviceProvider.getSpProperties()));
+        } else {
+            spPropList = new ArrayList<>();
+        }
+        return spPropList;
     }
 }
