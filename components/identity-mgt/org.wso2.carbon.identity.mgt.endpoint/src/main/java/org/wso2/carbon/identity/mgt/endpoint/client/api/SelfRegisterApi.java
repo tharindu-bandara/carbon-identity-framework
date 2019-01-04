@@ -48,7 +48,7 @@ public class SelfRegisterApi {
 
     String basePath = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
             .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL,
-                    "api/identity/user/v1.0");
+                    "/api/identity/user/v1.0");
     private ApiClient apiClient;
 
     public SelfRegisterApi() {
