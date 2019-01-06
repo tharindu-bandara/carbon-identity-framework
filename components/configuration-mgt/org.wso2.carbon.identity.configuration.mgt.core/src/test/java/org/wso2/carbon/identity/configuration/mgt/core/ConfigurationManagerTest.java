@@ -175,7 +175,7 @@ public class ConfigurationManagerTest extends PowerMockTestCase {
         ResourceAdd resourceTypeAdd = getSampleResource1Add();
 
         Resource resource = configurationManager.addResource(resourceType.getName(), resourceTypeAdd);
-        Assert.assertNotNull("Created resource type id cannot be null", resource.getResourceId());
+        Assert.assertNotNull("Created resource type id cannot be null", resource.getId());
     }
 
     @Test(priority = 10, expectedExceptions = ConfigurationManagementClientException.class)
@@ -200,7 +200,7 @@ public class ConfigurationManagerTest extends PowerMockTestCase {
 
         Resource resource = configurationManager.replaceResource(resourceType.getName(), resourceAdd);
 
-        Assert.assertNotNull("Created resource id cannot be null", resource.getResourceId());
+        Assert.assertNotNull("Created resource id cannot be null", resource.getId());
     }
 
     @Test(priority = 12)
@@ -213,8 +213,8 @@ public class ConfigurationManagerTest extends PowerMockTestCase {
         Resource resourceCreated = configurationManager.addResource(resourceType.getName(), resourceAdd);
         Resource resourceReplaced = configurationManager.replaceResource(resourceType.getName(), resourceAdd);
 
-        Assert.assertEquals("Existing id should be equal to the replaced id", resourceCreated.getResourceId(),
-                resourceReplaced.getResourceId());
+        Assert.assertEquals("Existing id should be equal to the replaced id", resourceCreated.getId(),
+                resourceReplaced.getId());
     }
 
     @Test(priority = 13, expectedExceptions = ConfigurationManagementClientException.class)
@@ -235,8 +235,8 @@ public class ConfigurationManagerTest extends PowerMockTestCase {
         Resource resourceCreated = configurationManager.addResource(resourceType.getName(), getSampleResource1Add());
         Resource resourceRetrieved = configurationManager.getResource(resourceType.getName(), SAMPLE_RESOURCE_NAME);
 
-        Assert.assertEquals("Existing id should be equal to the retrieved id", resourceCreated.getResourceId(),
-                resourceRetrieved.getResourceId());
+        Assert.assertEquals("Existing id should be equal to the retrieved id", resourceCreated.getId(),
+                resourceRetrieved.getId());
     }
 
     @Test(priority = 15, expectedExceptions = ConfigurationManagementClientException.class)
@@ -270,7 +270,7 @@ public class ConfigurationManagerTest extends PowerMockTestCase {
 
         Attribute retrievedAttribute = configurationManager.addAttribute(resourceType.getName(),
                 resource.getResourceName(), attribute);
-        Assert.assertNotNull("Created resource type id cannot be null", retrievedAttribute.getAttributeId());
+        Assert.assertNotNull("Created resource type id cannot be null", retrievedAttribute.getId());
     }
 
     @Test(priority = 18, expectedExceptions = ConfigurationManagementClientException.class)
@@ -295,7 +295,7 @@ public class ConfigurationManagerTest extends PowerMockTestCase {
 
         Attribute retrievedAttribute = configurationManager.replaceAttribute(resourceType.getName(),
                 resource.getResourceName(), attribute);
-        Assert.assertNotNull("Created resource id cannot be null", retrievedAttribute.getAttributeId());
+        Assert.assertNotNull("Created resource id cannot be null", retrievedAttribute.getId());
     }
 
     @Test(priority = 20)
@@ -310,8 +310,8 @@ public class ConfigurationManagerTest extends PowerMockTestCase {
         Attribute retrievedAttribute = configurationManager.replaceAttribute(resourceType.getName(),
                 resource.getResourceName(), attribute);
 
-        Assert.assertEquals("Existing id should be equal to the replaced id", createdAttribute.getAttributeId(),
-                retrievedAttribute.getAttributeId());
+        Assert.assertEquals("Existing id should be equal to the replaced id", createdAttribute.getId(),
+                retrievedAttribute.getId());
     }
 
     @Test(priority = 21)
@@ -328,7 +328,7 @@ public class ConfigurationManagerTest extends PowerMockTestCase {
                 resource.getResourceName(), attribute);
 
         Assert.assertEquals("Existing id should be equal to the replaced id",
-                createdAttribute.getAttributeId(), retrievedAttribute.getAttributeId());
+                createdAttribute.getId(), retrievedAttribute.getId());
         Assert.assertEquals("Retrieved value should be equal to the updated value",
                 retrievedAttribute.getValue(), SAMPLE_ATTRIBUTE_VALUE3_UPDATED);
     }
