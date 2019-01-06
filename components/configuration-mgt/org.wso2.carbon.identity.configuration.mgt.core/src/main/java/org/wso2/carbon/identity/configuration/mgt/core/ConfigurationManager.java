@@ -249,4 +249,33 @@ public interface ConfigurationManager {
      */
     void deleteFileById(String fileId)
             throws ConfigurationManagementException;
+
+    /**
+     * This API is used to verify the existence of the {@link ResourceType}.
+     *
+     * @param resourceTypeName Name of the {@link ResourceType}.
+     * @throws ConfigurationManagementException Configuration Management Exception.
+     */
+    boolean isResourceTypeExists(String resourceTypeName) throws ConfigurationManagementException;
+
+    /**
+     * This API is used to verify the existence of the given resource.
+     *
+     * @param resourceTypeName Name of the {@link ResourceType}.
+     * @param resourceName     Request to delete the {@link Resource}.
+     * @throws ConfigurationManagementException Resource management exception.
+     */
+    boolean isResourceExists(String resourceTypeName, String resourceName)
+            throws ConfigurationManagementException;
+
+    /**
+     * This API is used to verify the existence of the given attribute.
+     *
+     * @param resourceTypeName Name of the {@link ResourceType}.
+     * @param resourceName     Name of the {@link Resource}.
+     * @param attributeKey     Key of the {@link Attribute}.
+     * @throws ConfigurationManagementException Resource management exception.
+     */
+    boolean isAttributeExists(String resourceTypeName, String resourceName, String attributeKey)
+            throws ConfigurationManagementException;
 }
