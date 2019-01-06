@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementClientException;
 import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceType;
+import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceTypeAdd;
 import org.wso2.carbon.identity.configuration.mgt.endpoint.ResourceTypeApiService;
 import org.wso2.carbon.identity.configuration.mgt.endpoint.dto.ResourceTypeAddDTO;
 
@@ -72,9 +73,18 @@ public class ResourceTypeApiServiceImpl extends ResourceTypeApiService {
     public Response resourceTypePut(ResourceTypeAddDTO resourceTypeAddDTO) {
 
         try {
-            ResourceType resourceType =
-                    getConfigurationManager().replaceResourceType(getResourceTypeAddFromDTO(resourceTypeAddDTO));
-            return Response.ok().entity(getResourceTypeDTO(resourceType)).build();
+            ResourceTypeAdd resourceTypeAdd = getResourceTypeAddFromDTO(resourceTypeAddDTO);
+            ResourceType resourceType;
+            if (getConfigurationManager().isResourceTypeExists(resourceTypeAdd.getName())) {
+                resourceType =
+                        getConfigurationManager().replaceResourceType(resourceTypeAdd);
+                return Response.ok().entity(getResourceTypeDTO(resourceType)).build();
+            } else {
+                resourceType =
+                        getConfigurationManager().addResourceType(resourceTypeAdd);
+                return Response.created(getResourceTypeURI(resourceType))
+                        .entity(getResourceTypeDTO(resourceType)).build();
+            }
         } catch (ConfigurationManagementClientException e) {
             return handleBadRequestResponse(e, LOG);
         } catch (ConfigurationManagementException e) {

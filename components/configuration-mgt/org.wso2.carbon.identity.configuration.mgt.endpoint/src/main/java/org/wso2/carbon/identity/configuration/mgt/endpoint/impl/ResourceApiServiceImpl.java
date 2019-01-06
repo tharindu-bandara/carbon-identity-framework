@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationMa
 import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Attribute;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
+import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceAdd;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceFile;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resources;
 import org.wso2.carbon.identity.configuration.mgt.endpoint.ResourceApiService;
@@ -119,9 +120,15 @@ public class ResourceApiServiceImpl extends ResourceApiService {
     public Response resourceResourceTypePut(String resourceType, ResourceAddDTO resourceAddDTO) {
 
         try {
-            Resource resource = getConfigurationManager()
-                    .replaceResource(resourceType, getResourceAddFromDTO(resourceAddDTO));
-            return Response.ok().entity(getResourceDTO(resource)).build();
+            ResourceAdd resourceAdd = getResourceAddFromDTO(resourceAddDTO);
+            Resource resource;
+            if (getConfigurationManager().isResourceExists(resourceType, resourceAdd.getName())) {
+                resource = getConfigurationManager().replaceResource(resourceType, resourceAdd);
+                return Response.ok().entity(getResourceDTO(resource)).build();
+            } else {
+                resource = getConfigurationManager().addResource(resourceType, resourceAdd);
+                return Response.created(getResourceURI(resourceType, resource)).entity(getResourceDTO(resource)).build();
+            }
         } catch (ConfigurationManagementClientException e) {
             return handleBadRequestResponse(e, LOG);
         } catch (ConfigurationManagementException e) {
@@ -227,9 +234,17 @@ public class ResourceApiServiceImpl extends ResourceApiService {
             String resourceName, String resourceType, AttributeDTO attributeDTO) {
 
         try {
-            Attribute attribute = getConfigurationManager().replaceAttribute(
-                    resourceType, resourceName, getAttributeFromDTO(attributeDTO));
-            return Response.ok().entity(getAttributeDTO(attribute)).build();
+            Attribute attribute = getAttributeFromDTO(attributeDTO);
+            if (getConfigurationManager().isAttributeExists(resourceType, resourceName, attribute.getKey())) {
+                attribute = getConfigurationManager().replaceAttribute(
+                        resourceType, resourceName, attribute);
+                return Response.ok().entity(getAttributeDTO(attribute)).build();
+            } else {
+                attribute = getConfigurationManager().addAttribute(
+                        resourceType, resourceName, attribute);
+                return Response.created(getAttributeLocationURI(resourceType, resourceName, attribute)).entity(
+                        getAttributeDTO(attribute)).build();
+            }
         } catch (ConfigurationManagementClientException e) {
             return handleBadRequestResponse(e, LOG);
         } catch (ConfigurationManagementException e) {
@@ -324,14 +339,14 @@ public class ResourceApiServiceImpl extends ResourceApiService {
 
     private URI getResourceURI(String resourceType, Resource resource) throws URISyntaxException {
 
-        return new URI(RESOURCE_PATH + '/' + resourceType + '/' + resource.getResourceId());
+        return new URI(RESOURCE_PATH + '/' + resourceType + '/' + resource.getId());
     }
 
     private URI getAttributeLocationURI(String resourceType, String resourceName, Attribute attribute)
             throws URISyntaxException {
 
         return new URI(RESOURCE_PATH + '/' + resourceType + '/' + resourceName + '/' + ATTRIBUTE
-                + '/' + attribute.getAttributeId());
+                + '/' + attribute.getId());
     }
 
     private URI getFileLocationURI(String resourceType, String resourceName, ResourceFile resourceFile)
