@@ -81,10 +81,6 @@ import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConsta
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.GET_FILES_BY_RESOURCE_ID_SQL;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.GET_FILE_BY_ID_SQL;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.GET_TENANT_RESOURCES_SELECT_COLUMNS_MYSQL;
-import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.INSERT_OR_UPDATE_ATTRIBUTES_MYSQL;
-import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.INSERT_OR_UPDATE_ATTRIBUTE_H2;
-import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.INSERT_OR_UPDATE_RESOURCE_H2;
-import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.INSERT_OR_UPDATE_RESOURCE_TYPE_H2;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.MAX_QUERY_LENGTH_SQL;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.UPDATE_HAS_ATTRIBUTE_SQL;
 import static org.wso2.carbon.identity.configuration.mgt.core.constant.SQLConstants.UPDATE_HAS_FILE_SQL;
@@ -94,8 +90,6 @@ import static org.wso2.carbon.identity.configuration.mgt.core.util.Configuration
 import static org.wso2.carbon.identity.configuration.mgt.core.util.ConfigurationUtils.getMaximumQueryLength;
 import static org.wso2.carbon.identity.configuration.mgt.core.util.ConfigurationUtils.handleClientException;
 import static org.wso2.carbon.identity.configuration.mgt.core.util.ConfigurationUtils.handleServerException;
-import static org.wso2.carbon.identity.configuration.mgt.core.util.JdbcUtils.isH2;
-import static org.wso2.carbon.identity.configuration.mgt.core.util.JdbcUtils.isH2MySqlOrPostgresDB;
 
 public class ConfigurationDAOImpl implements ConfigurationDAO {
 
@@ -127,17 +121,18 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         try {
             configurationRawDataCollectors = jdbcTemplate.executeQuery(placeholderSQL.getQuery(),
                     (resultSet, rowNumber) -> new ConfigurationRawDataCollector.ConfigurationRawDataCollectorBuilder()
-                            .setResourceId(resultSet.getString("ID"))
-                            .setTenantId(resultSet.getInt("TENANT_ID"))
-                            .setResourceName(resultSet.getString("NAME"))
-                            .setLastModified(resultSet.getString("LAST_MODIFIED"))
-                            .setResourceName(resultSet.getString("NAME"))
-                            .setResourceTypeName(resultSet.getString("RESOURCE_TYPE"))
-                            .setResourceTypeDescription(resultSet.getString("DESCRIPTION"))
-                            .setAttributeKey(resultSet.getString("ATTR_KEY"))
-                            .setAttributeValue(resultSet.getString("ATTR_VALUE"))
-                            .setAttributeId(resultSet.getString("ATTR_ID"))
-                            .setFileId(resultSet.getString("FILE_ID"))
+                            .setResourceId(resultSet.getString(1))
+                            .setTenantId(resultSet.getInt(2))
+                            .setResourceName(resultSet.getString(3))
+                            .setLastModified(resultSet.getString(4))
+                            .setHasFile(resultSet.getBoolean(5))
+                            .setHasAttribute(resultSet.getBoolean(6))
+                            .setResourceTypeName(resultSet.getString(7))
+                            .setResourceTypeDescription(resultSet.getString(8))
+                            .setFileId(resultSet.getString(9))
+                            .setAttributeId(resultSet.getString(10))
+                            .setAttributeKey(resultSet.getString(11))
+                            .setAttributeValue(resultSet.getString(12))
                             .build(), preparedStatement -> {
                         for (int count = 0; count < placeholderSQL.getData().size(); count++) {
                             if (placeholderSQL.getData().get(count).getClass().equals(Integer.class)) {
@@ -175,19 +170,18 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         try {
             configurationRawDataCollectors = jdbcTemplate.executeQuery(SQLConstants.GET_RESOURCE_BY_NAME_MYSQL,
                     (resultSet, rowNumber) -> new ConfigurationRawDataCollector.ConfigurationRawDataCollectorBuilder()
-                            .setResourceId(resultSet.getString("ID"))
-                            .setTenantId(resultSet.getInt("TENANT_ID"))
-                            .setResourceName(resultSet.getString("NAME"))
-                            .setLastModified(resultSet.getString("LAST_MODIFIED"))
-                            .setResourceName(resultSet.getString("NAME"))
-                            .setResourceTypeName(resultSet.getString("RESOURCE_TYPE"))
-                            .setResourceTypeDescription(resultSet.getString("DESCRIPTION"))
-                            .setAttributeKey(resultSet.getString("ATTR_KEY"))
-                            .setAttributeValue(resultSet.getString("ATTR_VALUE"))
-                            .setAttributeId(resultSet.getString("ATTR_ID"))
-                            .setFileId(resultSet.getString("FILE_ID"))
-                            .setHasFile(resultSet.getBoolean("HAS_FILE"))
-                            .setHasAttribute(resultSet.getBoolean("HAS_ATTRIBUTE"))
+                            .setResourceId(resultSet.getString(1))
+                            .setTenantId(resultSet.getInt(2))
+                            .setResourceName(resultSet.getString(3))
+                            .setLastModified(resultSet.getString(4))
+                            .setHasFile(resultSet.getBoolean(5))
+                            .setHasAttribute(resultSet.getBoolean(6))
+                            .setResourceTypeName(resultSet.getString(7))
+                            .setResourceTypeDescription(resultSet.getString(8))
+                            .setFileId(resultSet.getString(9))
+                            .setAttributeId(resultSet.getString(10))
+                            .setAttributeKey(resultSet.getString(11))
+                            .setAttributeValue(resultSet.getString(12))
                             .build(), preparedStatement -> {
                         preparedStatement.setString(1, resourceName);
                         preparedStatement.setInt(2, tenantId);
@@ -215,19 +209,18 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         try {
             configurationRawDataCollectors = jdbcTemplate.executeQuery(SQLConstants.GET_RESOURCE_BY_ID_MYSQL,
                     (resultSet, rowNumber) -> new ConfigurationRawDataCollector.ConfigurationRawDataCollectorBuilder()
-                            .setResourceId(resultSet.getString("ID"))
-                            .setTenantId(resultSet.getInt("TENANT_ID"))
-                            .setResourceName(resultSet.getString("NAME"))
-                            .setLastModified(resultSet.getString("LAST_MODIFIED"))
-                            .setResourceName(resultSet.getString("NAME"))
-                            .setResourceTypeName(resultSet.getString("RESOURCE_TYPE"))
-                            .setResourceTypeDescription(resultSet.getString("DESCRIPTION"))
-                            .setAttributeKey(resultSet.getString("ATTR_KEY"))
-                            .setAttributeValue(resultSet.getString("ATTR_VALUE"))
-                            .setAttributeId(resultSet.getString("ATTR_ID"))
-                            .setHasFile(resultSet.getBoolean("HAS_FILE"))
-                            .setHasAttribute(resultSet.getBoolean("HAS_ATTRIBUTE"))
-                            .setFileId(resultSet.getString("FILE_ID"))
+                            .setResourceId(resultSet.getString(1))
+                            .setTenantId(resultSet.getInt(2))
+                            .setResourceName(resultSet.getString(3))
+                            .setLastModified(resultSet.getString(4))
+                            .setHasFile(resultSet.getBoolean(5))
+                            .setHasAttribute(resultSet.getBoolean(6))
+                            .setResourceTypeName(resultSet.getString(7))
+                            .setResourceTypeDescription(resultSet.getString(8))
+                            .setFileId(resultSet.getString(9))
+                            .setAttributeId(resultSet.getString(10))
+                            .setAttributeKey(resultSet.getString(11))
+                            .setAttributeValue(resultSet.getString(12))
                             .build(), preparedStatement -> preparedStatement.setString(1, resourceId));
             /*
             Database call can contain duplicate data for some columns. Need to filter them in order to build the
@@ -266,35 +259,33 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         JdbcTemplate jdbcTemplate = JdbcUtils.getNewTemplate();
         try {
             jdbcTemplate.withTransaction(template -> {
-                String query = SQLConstants.INSERT_OR_UPDATE_RESOURCE_MYSQL;
-                if (isH2()) {
-                    query = INSERT_OR_UPDATE_RESOURCE_H2;
-                }
+                String query = SQLConstants.UPDATE_RESOURCE_SQL;
+
                 boolean isAttributeExists = resource.getAttributes() != null;
 
                 // Insert resource metadata.
                 template.executeInsert(query, preparedStatement -> {
-                    preparedStatement.setString(1, resource.getResourceId());
-                    preparedStatement.setInt(2, PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    preparedStatement.setInt(1, PrivilegedCarbonContext.getThreadLocalCarbonContext()
                             .getTenantId());
-                    preparedStatement.setString(3, resource.getResourceName());
-                    preparedStatement.setTimestamp(4, new java.sql.Timestamp(new Date().getTime()),
+                    preparedStatement.setString(2, resource.getResourceName());
+                    preparedStatement.setTimestamp(3, new java.sql.Timestamp(new Date().getTime()),
                             Calendar.getInstance(TimeZone.getTimeZone(UTC)));
                     /*
                     Resource files are uploaded using a separate endpoint. Therefore resource creation does not create
                     files. It is allowed to create a resource without files or attributes in order to allow file upload
                     after resource creation.
                      */
-                    preparedStatement.setBoolean(5, false);
-                    preparedStatement.setBoolean(6, isAttributeExists);
-                    preparedStatement.setString(7, resourceTypeId);
+                    preparedStatement.setBoolean(4, false);
+                    preparedStatement.setBoolean(5, isAttributeExists);
+                    preparedStatement.setString(6, resourceTypeId);
+                    preparedStatement.setString(7, resource.getId());
                 }, resource, false);
 
                 // Insert attributes.
                 if (isAttributeExists) {
                     // Delete existing attributes.
                     template.executeUpdate(DELETE_RESOURCE_ATTRIBUTES_SQL, preparedStatement ->
-                            preparedStatement.setString(1, resource.getResourceId()));
+                            preparedStatement.setString(1, resource.getId()));
 
                     // Create sql query for attribute parameters.
                     String attributesQuery = buildQueryForAttributes(resource);
@@ -302,7 +293,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
                         int attributeCount = 0;
                         for (Attribute attribute : resource.getAttributes()) {
                             preparedStatement.setString(++attributeCount, generateUniqueID());
-                            preparedStatement.setString(++attributeCount, resource.getResourceId());
+                            preparedStatement.setString(++attributeCount, resource.getId());
                             preparedStatement.setString(++attributeCount, attribute.getKey());
                             preparedStatement.setString(++attributeCount, attribute.getValue());
                         }
@@ -329,7 +320,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
 
                 // Insert resource metadata.
                 template.executeInsert(SQLConstants.INSERT_RESOURCE_SQL, preparedStatement -> {
-                    preparedStatement.setString(1, resource.getResourceId());
+                    preparedStatement.setString(1, resource.getId());
                     preparedStatement.setInt(2, PrivilegedCarbonContext.getThreadLocalCarbonContext()
                             .getTenantId());
                     preparedStatement.setString(3, resource.getResourceName());
@@ -353,7 +344,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
                         int attributeCount = 0;
                         for (Attribute attribute : resource.getAttributes()) {
                             preparedStatement.setString(++attributeCount, generateUniqueID());
-                            preparedStatement.setString(++attributeCount, resource.getResourceId());
+                            preparedStatement.setString(++attributeCount, resource.getId());
                             preparedStatement.setString(++attributeCount, attribute.getKey());
                             preparedStatement.setString(++attributeCount, attribute.getValue());
                         }
@@ -390,15 +381,12 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
 
         JdbcTemplate jdbcTemplate = JdbcUtils.getNewTemplate();
         try {
-            String query = SQLConstants.INSERT_OR_UPDATE_RESOURCE_TYPE_MYSQL;
-            if (isH2()) {
-                query = INSERT_OR_UPDATE_RESOURCE_TYPE_H2;
-            }
+            String query = SQLConstants.UPDATE_RESOURCE_TYPE_SQL;
 
             jdbcTemplate.executeInsert(query, preparedStatement -> {
-                preparedStatement.setString(1, resourceType.getId());
-                preparedStatement.setString(2, resourceType.getName());
-                preparedStatement.setString(3, resourceType.getDescription());
+                preparedStatement.setString(1, resourceType.getName());
+                preparedStatement.setString(2, resourceType.getDescription());
+                preparedStatement.setString(3, resourceType.getId());
             }, resourceType, false);
         } catch (DataAccessException e) {
             throw handleServerException(ERROR_CODE_UPDATE_RESOURCE_TYPE, resourceType.getName(), e);
@@ -473,7 +461,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         JdbcTemplate jdbcTemplate = JdbcUtils.getNewTemplate();
         try {
             jdbcTemplate.withTransaction(template -> {
-                template.executeUpdate(SQLConstants.UPDATE_ATTRIBUTE_MYSQL, preparedStatement -> {
+                template.executeUpdate(SQLConstants.UPDATE_ATTRIBUTE_VALUE_SQL, preparedStatement -> {
                     preparedStatement.setString(1, attribute.getValue());
                     preparedStatement.setString(2, attributeId);
                 });
@@ -496,7 +484,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         JdbcTemplate jdbcTemplate = JdbcUtils.getNewTemplate();
         try {
             jdbcTemplate.withTransaction(template -> {
-                template.executeUpdate(SQLConstants.INSERT_ATTRIBUTE_MYSQL, preparedStatement -> {
+                template.executeUpdate(SQLConstants.INSERT_ATTRIBUTE_SQL, preparedStatement -> {
                     preparedStatement.setString(1, attributeId);
                     preparedStatement.setString(2, resourceId);
                     preparedStatement.setString(3, attribute.getKey());
@@ -522,15 +510,12 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         JdbcTemplate jdbcTemplate = JdbcUtils.getNewTemplate();
         try {
             jdbcTemplate.withTransaction(template -> {
-                String query = SQLConstants.INSERT_OR_UPDATE_ATTRIBUTE_MYSQL;
-                if (isH2()) {
-                    query = INSERT_OR_UPDATE_ATTRIBUTE_H2;
-                }
+                String query = SQLConstants.UPDATE_ATTRIBUTE_SQL;
                 template.executeUpdate(query, preparedStatement -> {
-                    preparedStatement.setString(1, attributeId);
-                    preparedStatement.setString(2, resourceId);
-                    preparedStatement.setString(3, attribute.getKey());
-                    preparedStatement.setString(4, attribute.getValue());
+                    preparedStatement.setString(1, resourceId);
+                    preparedStatement.setString(2, attribute.getKey());
+                    preparedStatement.setString(3, attribute.getValue());
+                    preparedStatement.setString(4, attributeId);
                 });
                 template.executeUpdate(UPDATE_LAST_MODIFIED_SQL, preparedStatement -> {
                     preparedStatement.setTimestamp(1, new java.sql.Timestamp(new Date().getTime()),
@@ -550,9 +535,9 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         try {
             return jdbcTemplate.fetchSingleRecord(SQLConstants.GET_ATTRIBUTE_SQL,
                     (resultSet, rowNumber) -> new Attribute(
-                            resultSet.getString("ATTR_KEY"),
-                            resultSet.getString("ATTR_VALUE"),
-                            resultSet.getString("ID")
+                            resultSet.getString(1),
+                            resultSet.getString(2),
+                            resultSet.getString(3)
                     ),
                     preparedStatement -> {
                         preparedStatement.setString(1, attributeKey);
@@ -598,7 +583,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         try {
             return jdbcTemplate.fetchSingleRecord(SQLConstants.GET_FILE_BY_ID_SQL,
                     (resultSet, rowNumber) -> {
-                        Blob fileBlob = resultSet.getBlob("VALUE");
+                        Blob fileBlob = resultSet.getBlob(2);
                         if (fileBlob == null) {
                             return null;
                         }
@@ -659,7 +644,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         try {
             return jdbcTemplate.executeQuery(GET_FILES_BY_RESOURCE_ID_SQL,
                     ((resultSet, rowNumber) -> {
-                        String resourceFileId = resultSet.getString("ID");
+                        String resourceFileId = resultSet.getString(1);
                         return new ResourceFile(
                                 resourceFileId,
                                 getFilePath(resourceFileId)
@@ -724,8 +709,8 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
     private Resources buildResourcesFromRawData(List<ConfigurationRawDataCollector> configurationRawDataCollectors) {
 
         Map<String, Resource> resourcesCollector = new HashMap<>();
-        Map<String, List<Attribute>> attributes = new HashMap<>(0); // attribute list pet resource
-        Map<String, List<ResourceFile>> resourceFiles = new HashMap<>(0); // file list pet resource
+        Map<String, List<Attribute>> attributes = new HashMap<>(0);        // Attribute list pet resource.
+        Map<String, List<ResourceFile>> resourceFiles = new HashMap<>(0);  // File list pet resource.
         Map<String, List<String>> attributeKeySet = new HashMap<>();
         Map<String, List<String>> resourceFileIdSet = new HashMap<>();
 
@@ -733,7 +718,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
             String eachResourceId = configurationRawDataCollector.getResourceId();
             if (resourcesCollector.get(eachResourceId) == null) {
                 Resource resource = new Resource();
-                resource.setResourceId(configurationRawDataCollector.getResourceId());
+                resource.setId(configurationRawDataCollector.getResourceId());
                 resource.setResourceName(configurationRawDataCollector.getResourceName());
                 resource.setResourceType(configurationRawDataCollector.getResourceTypeName());
                 resource.setHasFile(configurationRawDataCollector.isHasFile());
@@ -773,8 +758,8 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
             }
         });
         resourcesCollector.values().forEach(resource -> {
-            resource.setAttributes(attributes.get(resource.getResourceId()));
-            resource.setFiles(resourceFiles.get(resource.getResourceId()));
+            resource.setAttributes(attributes.get(resource.getId()));
+            resource.setFiles(resourceFiles.get(resource.getId()));
         });
         return new Resources(new ArrayList<>(resourcesCollector.values()));
     }
@@ -787,8 +772,8 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         Set<String> attributeKeySet = new HashSet<>();
         Set<String> fileIdSet = new HashSet<>();
         configurationRawDataCollectors.forEach(configurationRawDataCollector -> {
-            if (resource.getResourceId() == null) {
-                resource.setResourceId(configurationRawDataCollector.getResourceId());
+            if (resource.getId() == null) {
+                resource.setId(configurationRawDataCollector.getResourceId());
                 resource.setHasFile(configurationRawDataCollector.isHasFile());
                 resource.setHasAttribute(configurationRawDataCollector.isHasAttribute());
                 resource.setResourceName(configurationRawDataCollector.getResourceName());
@@ -823,15 +808,10 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         return resource;
     }
 
-    private String buildQueryForAttributes(Resource resource) throws ConfigurationManagementClientException,
-            DataAccessException {
+    private String buildQueryForAttributes(Resource resource) throws ConfigurationManagementClientException {
 
         StringBuilder sb = new StringBuilder();
-        if (isH2()) {
-            sb.append(SQLConstants.UPDATE_ATTRIBUTES_H2);
-        } else {
-            sb.append(SQLConstants.INSERT_ATTRIBUTES_SQL);
-        }
+        sb.append(SQLConstants.INSERT_ATTRIBUTES_SQL);
 
         // Since attributes exist, query is already built for the first attribute.
         for (int i = 1; i < resource.getAttributes().size(); i++) {
@@ -845,9 +825,6 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
                 throw handleClientException(ERROR_CODE_QUERY_LENGTH_EXCEEDED, null);
             }
         }
-        if (!isH2() && isH2MySqlOrPostgresDB()) {
-            sb.append(INSERT_OR_UPDATE_ATTRIBUTES_MYSQL);
-        }
         return sb.toString();
     }
 
@@ -860,9 +837,9 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
                     selectGetResourceTypeQuery(id),
                     (resultSet, rowNumber) -> {
                         ResourceType resourceType = new ResourceType();
-                        resourceType.setId(resultSet.getString("ID"));
-                        resourceType.setName(resultSet.getString("NAME"));
-                        resourceType.setDescription(resultSet.getString("DESCRIPTION"));
+                        resourceType.setId(resultSet.getString(1));
+                        resourceType.setName(resultSet.getString(2));
+                        resourceType.setDescription(resultSet.getString(3));
                         return resourceType;
                     }, preparedStatement ->
                             preparedStatement.setString(1, StringUtils.isEmpty(name) ? id : name)

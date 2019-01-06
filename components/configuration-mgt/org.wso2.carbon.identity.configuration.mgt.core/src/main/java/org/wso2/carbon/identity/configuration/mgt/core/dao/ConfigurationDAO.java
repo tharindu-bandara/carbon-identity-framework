@@ -81,7 +81,7 @@ public interface ConfigurationDAO {
     void addResource(Resource resource) throws ConfigurationManagementException;
 
     /**
-     * Replace {@link Resource} or create not exists.
+     * Replace existing {@link Resource}.
      *
      * @param resource {@link Resource} to be added.
      * @throws ConfigurationManagementException Configuration Management Exception.
@@ -97,7 +97,7 @@ public interface ConfigurationDAO {
     void addResourceType(ResourceType resourceType) throws ConfigurationManagementException;
 
     /**
-     * Replace {@link ResourceType}.
+     * Replace existing {@link ResourceType}.
      *
      * @param resourceType {@link ResourceType} to be replaced.
      * @throws ConfigurationManagementException Configuration Management Exception.
@@ -162,7 +162,7 @@ public interface ConfigurationDAO {
             throws ConfigurationManagementException;
 
     /**
-     * Replace {@link Attribute}.
+     * Replace existing {@link Attribute}.
      *
      * @param attributeId Id of the {@link Attribute}.
      * @param attribute   {@link Attribute} to be replaced.
