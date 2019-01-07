@@ -334,6 +334,9 @@ public class IdentityConstants {
         public static final String OAUTH2_JWKS_EP_URL = "OAuth.OAuth2JWKSPage";
         public static final String OIDC_DISCOVERY_EP_URL = "OAuth.OIDCDiscoveryEPUrl";
 
+        public static final String OIDC_USE_ENTITY_ID_AS_ISSUER_IN_DISCOVERY = "OAuth" +
+                ".UseEntityIdAsIssuerInOidcDiscovery";
+
         public static final String REQUEST_TOKEN = "oauth/request-token";
         public static final String AUTHORIZE_URL = "oauth/authorize-url";
         public static final String ACCESS_TOKEN = "oauth/access-token";
