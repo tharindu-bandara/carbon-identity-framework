@@ -148,8 +148,12 @@ public class PostAuthnMissingClaimHandler extends AbstractPostAuthnHandler {
                 Map<String, String> missingClaimMap = FrameworkUtils.getMissingClaimsMap(context);
 
                 for (Map.Entry<String, String> missingClaim : missingClaimMap.entrySet()) {
-                    Claim claimObj = claimManager.getClaim(missingClaim.getKey());
-                    if (claimObj.isReadOnly()) {
+                    Claim claimObj = claimManager.getClaim(missingClaim.getValue());
+                    if (claimObj != null && claimObj.isReadOnly()) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Read only claim " + missingClaim.getValue() + " is missing and marked " +
+                                    "as mandatory.");
+                        }
                         throw new PostAuthenticationFailedException("One or more read-only claim is missing in the " +
                                 "requested claim set. Please contact your administrator for more information about " +
                                 "this issue.", "One or more read-only claim is missing in the requested claim set");
