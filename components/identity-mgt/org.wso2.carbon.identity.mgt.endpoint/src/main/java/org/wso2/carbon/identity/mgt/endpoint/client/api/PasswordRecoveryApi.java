@@ -24,12 +24,17 @@ import com.sun.jersey.api.client.GenericType;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.identity.mgt.endpoint.IdentityManagementEndpointConstants;
+import org.wso2.carbon.identity.mgt.endpoint.IdentityManagementEndpointUtil;
 import org.wso2.carbon.identity.mgt.endpoint.IdentityManagementServiceUtil;
 import org.wso2.carbon.identity.mgt.endpoint.client.ApiClient;
 import org.wso2.carbon.identity.mgt.endpoint.client.ApiException;
 import org.wso2.carbon.identity.mgt.endpoint.client.Configuration;
 import org.wso2.carbon.identity.mgt.endpoint.client.Pair;
-import org.wso2.carbon.identity.mgt.endpoint.client.model.*;
+import org.wso2.carbon.identity.mgt.endpoint.client.model.AnswerVerificationRequest;
+import org.wso2.carbon.identity.mgt.endpoint.client.model.InitiateAllQuestionResponse;
+import org.wso2.carbon.identity.mgt.endpoint.client.model.InitiateQuestionResponse;
+import org.wso2.carbon.identity.mgt.endpoint.client.model.RecoveryInitiatingRequest;
+import org.wso2.carbon.identity.mgt.endpoint.client.model.ResetPasswordRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,9 +44,9 @@ import java.util.Map;
 public class PasswordRecoveryApi {
     private ApiClient apiClient;
 
-    String basePath = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
-            .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL,
-                    "/api/identity/recovery/v0.9");
+    String basePath = IdentityManagementEndpointUtil.buildEndpointUrl(IdentityManagementEndpointConstants
+            .UserInfoRecovery.RECOVERY_API_RELATIVE_PATH);
+
 
     public PasswordRecoveryApi() {
         this(Configuration.getDefaultApiClient());
@@ -62,13 +67,15 @@ public class PasswordRecoveryApi {
     /**
      * This API is used to send password recovery confirmation over defined channels like email/sms
      *
-     * @param recoveryInitiatingRequest It can be sent optional property parameters over email based on email template. (required)
+     * @param recoveryInitiatingRequest It can be sent optional property parameters over email based on email
+     *                                  template. (required)
      * @param type                      Notification Type (optional)
      * @param notify                    If notify&#x3D;true then, notifications will be internally managed. (optional)
      * @return String
      * @throws ApiException if fails to make API call
      */
-    public String recoverPasswordPost(RecoveryInitiatingRequest recoveryInitiatingRequest, String type, Boolean notify) throws ApiException {
+    public String recoverPasswordPost(RecoveryInitiatingRequest recoveryInitiatingRequest, String type, Boolean
+            notify) throws ApiException {
         Object localVarPostBody = recoveryInitiatingRequest;
 
         // verify the required parameter 'recoveryInitiatingRequest' is set
@@ -82,11 +89,9 @@ public class PasswordRecoveryApi {
         }
 
         if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)) {
-            basePath = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
-                    .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL,
-                            "t/" + tenantDomain + "/api/identity/recovery/v0.9");
+            basePath = IdentityManagementEndpointUtil.buildEndpointUrl("t/" + tenantDomain +
+                    IdentityManagementEndpointConstants.UserInfoRecovery.RECOVERY_API_RELATIVE_PATH);
         }
-
 
         apiClient.setBasePath(basePath);
 
@@ -100,7 +105,6 @@ public class PasswordRecoveryApi {
 
         localVarQueryParams.addAll(apiClient.parameterToPairs("", "type", type));
         localVarQueryParams.addAll(apiClient.parameterToPairs("", "notify", notify));
-
 
         final String[] localVarAccepts = {
                 "application/json"
@@ -116,19 +120,24 @@ public class PasswordRecoveryApi {
 
         GenericType<String> localVarReturnType = new GenericType<String>() {
         };
-        return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
+        return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
     }
 
     /**
-     * This API is used to initiate password recovery using user challenge questions. Response will be a random challenge question with a confirmation key.
+     * This API is used to initiate password recovery using user challenge questions. Response will be a random
+     * challenge question with a confirmation key.
      *
      * @param username     username of the user (required)
-     * @param realm        &#x60;User Store Domain&#x60; which user belongs. If not specified, it will be &#x60;PRIMARY&#x60; domain.  (optional)
-     * @param tenantDomain &#x60;Tenant Domain&#x60; which user belongs. If not specified, it will be &#x60;carbon.super&#x60; domain.  (optional)
+     * @param realm        &#x60;User Store Domain&#x60; which user belongs. If not specified, it will be &#x60;
+     *                     PRIMARY&#x60; domain.  (optional)
+     * @param tenantDomain &#x60;Tenant Domain&#x60; which user belongs. If not specified, it will be &#x60;carbon
+     *                     .super&#x60; domain.  (optional)
      * @return InitiateQuestionResponse
      * @throws ApiException if fails to make API call
      */
-    public InitiateQuestionResponse securityQuestionGet(String username, String realm, String tenantDomain) throws ApiException {
+    public InitiateQuestionResponse securityQuestionGet(String username, String realm, String tenantDomain) throws
+            ApiException {
         Object localVarPostBody = null;
 
         // verify the required parameter 'username' is set
@@ -136,15 +145,13 @@ public class PasswordRecoveryApi {
             throw new ApiException(400, "Missing the required parameter 'username' when calling securityQuestionGet");
         }
 
-
         if (StringUtils.isBlank(tenantDomain)) {
             tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         }
 
         if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)) {
-            basePath = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
-                    .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL,
-                            "t/" + tenantDomain + "/api/identity/recovery/v0.9");
+            basePath = IdentityManagementEndpointUtil.buildEndpointUrl("/t/" + tenantDomain +
+                    IdentityManagementEndpointConstants.UserInfoRecovery.RECOVERY_API_RELATIVE_PATH);
         }
 
         apiClient.setBasePath(basePath);
@@ -196,15 +203,13 @@ public class PasswordRecoveryApi {
             throw new ApiException(400, "Missing the required parameter 'username' when calling securityQuestionsGet");
         }
 
-
         if (StringUtils.isBlank(tenantDomain)) {
             tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         }
 
         if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)) {
-            basePath = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
-                    .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL,
-                            "t/" + tenantDomain + "/api/identity/recovery/v0.9");
+            basePath = IdentityManagementEndpointUtil.buildEndpointUrl("/t/" + tenantDomain
+                    + IdentityManagementEndpointConstants.UserInfoRecovery.RECOVERY_API_RELATIVE_PATH);
         }
 
         apiClient.setBasePath(basePath);

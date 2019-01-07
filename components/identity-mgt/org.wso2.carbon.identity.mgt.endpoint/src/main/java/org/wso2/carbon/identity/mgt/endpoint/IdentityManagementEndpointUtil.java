@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.identity.mgt.endpoint;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.apache.axiom.om.util.Base64;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -31,18 +29,16 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.owasp.encoder.Encode;
-import org.wso2.carbon.identity.mgt.endpoint.client.ApiException;
-import org.wso2.carbon.identity.mgt.endpoint.client.api.UsernameRecoveryApi;
 import org.wso2.carbon.identity.mgt.endpoint.client.model.Claim;
 import org.wso2.carbon.identity.mgt.endpoint.client.model.User;
 import org.wso2.carbon.identity.mgt.stub.beans.VerificationBean;
 
-import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * This class defines utility methods used within this web application.
@@ -187,14 +183,16 @@ public class IdentityManagementEndpointUtil {
         return ArrayUtils.EMPTY_STRING_ARRAY;
     }
 
-    public static <T> T create(String baseAddress, Class<T> cls, List<?> providers, String configLocation, Map<String, String> headers) {
+    public static <T> T create(String baseAddress, Class<T> cls, List<?> providers, String configLocation,
+                               Map<String, String> headers) {
 
         JAXRSClientFactoryBean bean = getBean(baseAddress, cls, configLocation, headers);
         bean.setProviders(providers);
         return bean.create(cls, new Object[0]);
     }
 
-    private static JAXRSClientFactoryBean getBean(String baseAddress, Class<?> cls, String configLocation, Map<String, String> headers) {
+    private static JAXRSClientFactoryBean getBean(String baseAddress, Class<?> cls, String configLocation,
+                                                  Map<String, String> headers) {
 
         JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation, headers);
         bean.setServiceClass(cls);
@@ -415,5 +413,24 @@ public class IdentityManagementEndpointUtil {
             }
         }
         return piis;
+    }
+
+    /**
+     * Construct the URL depending on the path and the resource name.
+     *
+     * @param path path of the url
+     * @return  endpoint url
+     */
+    public static String buildEndpointUrl(String path) {
+
+        String endpointUrl = IdentityManagementServiceUtil.getInstance().getServiceContextURL()
+                .replace(IdentityManagementEndpointConstants.UserInfoRecovery.SERVICE_CONTEXT_URL, "");
+
+        if (path.startsWith("/")) {
+            return endpointUrl + path;
+        } else {
+            return endpointUrl + "/" + path;
+        }
+
     }
 }
