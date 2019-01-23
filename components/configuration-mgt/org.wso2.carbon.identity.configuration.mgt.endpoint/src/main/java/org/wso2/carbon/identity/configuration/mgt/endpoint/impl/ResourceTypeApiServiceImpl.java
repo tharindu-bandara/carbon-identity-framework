@@ -42,16 +42,6 @@ public class ResourceTypeApiServiceImpl extends ResourceTypeApiService {
     private static final Log LOG = LogFactory.getLog(ResourceTypeApiServiceImpl.class);
 
     @Override
-    public Response resourceTypePatch(ResourceTypeAddDTO resourceTypeAddDTO) {
-
-        try {
-            return Response.ok().entity(getOperationNotSupportedDTO()).build();
-        } catch (Throwable throwable) {
-            return handleUnexpectedServerError(throwable, LOG);
-        }
-    }
-
-    @Override
     public Response resourceTypePost(ResourceTypeAddDTO resourceTypeAddDTO) {
 
         try {
