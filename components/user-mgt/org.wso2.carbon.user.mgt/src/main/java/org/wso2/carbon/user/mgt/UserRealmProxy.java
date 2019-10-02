@@ -1076,7 +1076,14 @@ public class UserRealmProxy {
             }
 
             UserStoreManager usMan = realm.getUserStoreManager();
-            String[] usersOfRole = usMan.getUserListOfRole(roleName);
+            String[] usersOfRole;
+            boolean canListUsersOfRoleWithFilter = usMan instanceof AbstractUserStoreManager;
+            if (canListUsersOfRoleWithFilter) {
+                AbstractUserStoreManager abstractUserStoreManager = (AbstractUserStoreManager) usMan;
+                usersOfRole = abstractUserStoreManager.getUserListOfRole(roleName, filter, limit);
+            } else {
+                usersOfRole = usMan.getUserListOfRole(roleName);
+            }
             Arrays.sort(usersOfRole);
             Map<String, Integer> userCount = new HashMap<String, Integer>();
             if (limit == 0) {
@@ -1086,15 +1093,17 @@ public class UserRealmProxy {
                 for (String anUsersOfRole : usersOfRole) {
                     //check if display name is present in the user name
                     int combinerIndex = anUsersOfRole.indexOf(UserCoreConstants.NAME_COMBINER);
-                    Matcher matcher;
-                    if (combinerIndex > 0) {
-                        matcher = pattern.matcher(anUsersOfRole.substring(combinerIndex +
-                                UserCoreConstants.NAME_COMBINER.length()));
-                    } else {
-                        matcher = pattern.matcher(anUsersOfRole);
-                    }
-                    if (!matcher.matches()) {
-                        continue;
+                    if (!canListUsersOfRoleWithFilter) {
+                        Matcher matcher;
+                        if (combinerIndex > 0) {
+                            matcher = pattern.matcher(anUsersOfRole.substring(combinerIndex +
+                                    UserCoreConstants.NAME_COMBINER.length()));
+                        } else {
+                            matcher = pattern.matcher(anUsersOfRole);
+                        }
+                        if (!matcher.matches()) {
+                            continue;
+                        }
                     }
 
                     FlaggedName fName = new FlaggedName();
