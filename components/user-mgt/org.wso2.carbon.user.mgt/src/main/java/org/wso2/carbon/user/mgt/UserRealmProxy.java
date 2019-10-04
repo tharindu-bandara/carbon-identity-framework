@@ -77,6 +77,7 @@ public class UserRealmProxy {
             + CarbonConstants.UI_PERMISSION_NAME + RegistryConstants.PATH_SEPARATOR
             + "applications";
     private static final String DISAPLAY_NAME_CLAIM = "http://wso2.org/claims/displayName";
+    private static final int USER_COUNT_LIMIT_ANY = -1;
     public static final String FALSE = "false";
     public static final String PERMISSION = "/permission";
     public static final String PERMISSION_ADMIN = "/permission/admin";
@@ -1067,7 +1068,7 @@ public class UserRealmProxy {
                 filter = domain + CarbonConstants.DOMAIN_SEPARATOR + filter;
             }
 
-            if (domain == null && limit != 0) {
+            if (domain == null && limit != USER_COUNT_LIMIT_ANY) {
                 if (filter != null) {
                     filter = CarbonConstants.DOMAIN_SEPARATOR + filter;
                 } else {
@@ -1086,7 +1087,14 @@ public class UserRealmProxy {
             }
             Arrays.sort(usersOfRole);
             Map<String, Integer> userCount = new HashMap<String, Integer>();
-            if (limit == 0) {
+
+            /*
+            With the fix delivered for https://github.com/wso2/product-is/issues/6511, limiting and filtering from
+            the JDBC UserStoreManager is possible thus making the filtering and limiting logic in here irelavant for
+            JDBC UM. But still, Read Only LDAP UM does not supports DB level limiting and filtering(refer to
+            https://github.com/wso2/product-is/issues/6573) thus the logic is kept as it is.
+             */
+            if (limit == USER_COUNT_LIMIT_ANY) {
                 filter = filter.replace("*", ".*");
                 Pattern pattern = Pattern.compile(filter, Pattern.CASE_INSENSITIVE);
                 List<FlaggedName> flaggedNames = new ArrayList<FlaggedName>();

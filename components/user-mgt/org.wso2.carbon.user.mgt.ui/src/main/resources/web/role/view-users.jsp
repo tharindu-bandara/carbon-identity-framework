@@ -63,6 +63,7 @@
     int numberOfPages = 0;
     Map<Integer, PaginatedNamesBean> flaggedNameMap = null;
     Set<String> workFlowDeletePendingUsers = null;
+    int USER_COUNT_LIMIT_ANY = -1;
 
     if (request.getParameter("pageNumber") == null) {
         session.removeAttribute("checkedUsersMap");
@@ -179,7 +180,7 @@
             UserManagementWorkflowServiceClient UserMgtClient = new
                     UserManagementWorkflowServiceClient(cookie, backendServerURL, configContext);
             if (StringUtils.isNotEmpty(filter)) {
-                FlaggedName[] data = client.getUsersOfRole(roleName, filter, 0);
+                FlaggedName[] data = client.getUsersOfRole(roleName, filter, USER_COUNT_LIMIT_ANY);
                 if (CarbonUIUtil.isContextRegistered(config, "/usermgt-workflow/")) {
                     String[] DeletePendingRolesList = UserMgtClient.
                             listAllEntityNames("DELETE_USER", "PENDING", "USER", filter);
