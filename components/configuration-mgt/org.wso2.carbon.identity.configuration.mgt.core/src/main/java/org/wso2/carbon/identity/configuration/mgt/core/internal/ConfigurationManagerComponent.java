@@ -155,9 +155,8 @@ public class ConfigurationManagerComponent {
             /*
             DB scripts without CREATED_TIME field can exists for H2 and MYSQL 5.7.
              */
-            String sql = GET_CREATED_TIME_COLUMN_MYSQL;
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(GET_CREATED_TIME_COLUMN_MYSQL);
                  ResultSet resultSet = preparedStatement.executeQuery()) {
                 // Following statement will throw SQLException if the column is not found
                 resultSet.findColumn(DB_SCHEMA_COLUMN_NAME_CREATED_TIME);
