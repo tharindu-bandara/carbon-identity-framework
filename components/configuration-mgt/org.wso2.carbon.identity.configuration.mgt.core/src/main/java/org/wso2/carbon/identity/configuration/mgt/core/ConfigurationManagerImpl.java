@@ -881,6 +881,7 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
             if (isFileNotExistsError(e)) {
                 return false;
             }
+            e.printstacktrace();
             throw e;
         }
         return true;
