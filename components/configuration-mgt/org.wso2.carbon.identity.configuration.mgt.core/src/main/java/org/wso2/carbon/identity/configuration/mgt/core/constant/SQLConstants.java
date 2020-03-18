@@ -25,13 +25,13 @@ public class SQLConstants {
 
     public static final String MAX_QUERY_LENGTH_IN_BYTES_SQL =
             IdentityUtil.getProperty("ConfigurationStore.MaximumQueryLengthInBytes");
-    public static final String INSERT_RESOURCE_TYPE_SQL = "INSERT INTO IDN_CONFIG_TYPE (ID, NAME, DESCRIPTION) " +
-            "VALUES (?, ?, ?)";
+    public static final String INSERT_RESOURCE_TYPE_SQL = "INSERT INTO IDN_CONFIG_TYPE (ID, NAME, DESCRIPTION, TENANT_ID) " +
+            "VALUES (?, ?, ?, ?)";
     public static final String INSERT_OR_UPDATE_RESOURCE_TYPE_MYSQL = "INSERT INTO IDN_CONFIG_TYPE (ID, NAME, " +
-            "DESCRIPTION) VALUES (?, ?, ?)  ON DUPLICATE KEY UPDATE NAME = VALUES(NAME), " +
+            "DESCRIPTION, TENANT_ID) VALUES (?, ?, ?, ?)  ON DUPLICATE KEY UPDATE NAME = VALUES(NAME), " +
             "DESCRIPTION = VALUES(DESCRIPTION)";
     public static final String INSERT_OR_UPDATE_RESOURCE_TYPE_H2 = "MERGE INTO IDN_CONFIG_TYPE KEY (ID) " +
-            "VALUES (?, ?, ?)";
+            "VALUES (?, ?, ?, ?)";
     public static final String GET_CREATED_TIME_COLUMN_MYSQL =
             "SELECT CREATED_TIME FROM IDN_CONFIG_RESOURCE LIMIT 1";
     public static final String INSERT_RESOURCE_SQL = "INSERT INTO\n" +
@@ -124,11 +124,11 @@ public class SQLConstants {
             "  AND RESOURCE_ID = ?";
     public static final String DELETE_ATTRIBUTE_SQL = "DELETE FROM IDN_CONFIG_ATTRIBUTE WHERE ID = ?";
     public static final String GET_RESOURCE_TYPE_BY_NAME_SQL = "SELECT ID, NAME, DESCRIPTION FROM IDN_CONFIG_TYPE " +
-            "WHERE NAME = ? ";
+            "WHERE NAME = ? AND TENANT_ID = ? ";
     public static final String GET_RESOURCE_TYPE_BY_ID_SQL = "SELECT ID, NAME, DESCRIPTION FROM IDN_CONFIG_TYPE WHERE" +
-            " ID = ? ";
-    public static final String DELETE_RESOURCE_TYPE_BY_NAME_SQL = "DELETE FROM IDN_CONFIG_TYPE WHERE NAME = ?";
-    public static final String DELETE_RESOURCE_TYPE_BY_ID_SQL = "DELETE FROM IDN_CONFIG_TYPE WHERE ID = ?";
+            " ID = ? AND TENANT_ID = ? ";
+    public static final String DELETE_RESOURCE_TYPE_BY_NAME_SQL = "DELETE FROM IDN_CONFIG_TYPE WHERE NAME = ? AND TENANT_ID = ?";
+    public static final String DELETE_RESOURCE_TYPE_BY_ID_SQL = "DELETE FROM IDN_CONFIG_TYPE WHERE ID = ?  AND TENANT_ID = ?";
     public static final String GET_RESOURCE_ID_BY_NAME_SQL = "SELECT ID FROM IDN_CONFIG_RESOURCE WHERE NAME = ? AND " +
             "TENANT_ID = ? AND TYPE_ID = ?";
     public static final String GET_RESOURCE_BY_NAME_MYSQL = "SELECT\n" +

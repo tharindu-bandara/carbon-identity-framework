@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.configuration.mgt.core.dao;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Attribute;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
@@ -116,10 +117,26 @@ public interface ConfigurationDAO {
     /**
      * Get {@link ResourceType} by name.
      *
+     * @param tenantDomain Tenant domain.
      * @param resourceTypeName Name of the {@link ResourceType}.
      * @return {@link ResourceType} for the given name.
      * @throws ConfigurationManagementException Configuration Management Exception.
      */
+    default ResourceType getResourceTypeByName(String tenantDomain, String resourceTypeName)
+            throws ConfigurationManagementException {
+
+        throw new NotImplementedException("This method is yet to be implemented");
+    }
+
+    /**
+     * Get {@link ResourceType} by name.
+     *
+     * @deprecated Use tenant-isolated method({@link #getResourceTypeByName(String, String)}) instead.
+     * @param resourceTypeName Name of the {@link ResourceType}.
+     * @return {@link ResourceType} for the given name.
+     * @throws ConfigurationManagementException Configuration Management Exception.
+     */
+    @Deprecated
     ResourceType getResourceTypeByName(String resourceTypeName) throws ConfigurationManagementException;
 
     /**
@@ -129,6 +146,21 @@ public interface ConfigurationDAO {
      * @return {@link ResourceType} for the given id.
      * @throws ConfigurationManagementException Configuration Management Exception.
      */
+    default ResourceType getResourceTypeById(String tenantDomain, String resourceTypeId)
+            throws ConfigurationManagementException {
+
+        throw new NotImplementedException("This method is yet to be implemented");
+    }
+
+    /**
+     * Get {@link ResourceType} by id.
+     *
+     * @deprecated Use tenant-isolated method({@link #getResourceTypeById(String, String)}) instead.
+     * @param resourceTypeId Id of the {@link ResourceType}.
+     * @return {@link ResourceType} for the given id.
+     * @throws ConfigurationManagementException Configuration Management Exception.
+     */
+    @Deprecated
     ResourceType getResourceTypeById(String resourceTypeId) throws ConfigurationManagementException;
 
     /**
@@ -137,6 +169,20 @@ public interface ConfigurationDAO {
      * @param resourceTypeName Name of the {@link ResourceType}.
      * @throws ConfigurationManagementException Configuration Management Exception.
      */
+    default void deleteResourceTypeByName(String tenantDomain, String resourceTypeName)
+            throws ConfigurationManagementException {
+
+        throw new NotImplementedException("This method is yet to be implemented");
+    }
+
+    /**
+     * Delete {@link ResourceType} by name.
+     *
+     * @deprecated Use tenant-isolated method({@link #deleteResourceTypeByName(String, String)}) instead.
+     * @param resourceTypeName Name of the {@link ResourceType}.
+     * @throws ConfigurationManagementException Configuration Management Exception.
+     */
+    @Deprecated
     void deleteResourceTypeByName(String resourceTypeName) throws ConfigurationManagementException;
 
     /**

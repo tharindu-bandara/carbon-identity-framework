@@ -466,6 +466,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
     @Override
     public void addResourceType(ResourceType resourceType) throws ConfigurationManagementException {
 
+        int tenantId = resolveTenantId(resourceType);
         JdbcTemplate jdbcTemplate = JdbcUtils.getNewTemplate();
         try {
             jdbcTemplate.executeInsert(SQLConstants.INSERT_RESOURCE_TYPE_SQL, preparedStatement -> {
@@ -473,6 +474,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
                 preparedStatement.setString(initialParameterIndex, resourceType.getId());
                 preparedStatement.setString(++initialParameterIndex, resourceType.getName());
                 preparedStatement.setString(++initialParameterIndex, resourceType.getDescription());
+                preparedStatement.setInt(++initialParameterIndex, tenantId);
             }, resourceType, false);
         } catch (DataAccessException e) {
             throw handleServerException(ERROR_CODE_ADD_RESOURCE_TYPE, resourceType.getName(), e);
@@ -485,6 +487,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
     @Override
     public void replaceResourceType(ResourceType resourceType) throws ConfigurationManagementException {
 
+        int tenantId = resolveTenantId(resourceType);
         JdbcTemplate jdbcTemplate = JdbcUtils.getNewTemplate();
         try {
             String query = SQLConstants.INSERT_OR_UPDATE_RESOURCE_TYPE_MYSQL;
@@ -497,6 +500,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
                 preparedStatement.setString(initialParameterIndex, resourceType.getId());
                 preparedStatement.setString(++initialParameterIndex, resourceType.getName());
                 preparedStatement.setString(++initialParameterIndex, resourceType.getDescription());
+                preparedStatement.setInt(++initialParameterIndex, tenantId);
             }, resourceType, false);
         } catch (DataAccessException e) {
             throw handleServerException(ERROR_CODE_UPDATE_RESOURCE_TYPE, resourceType.getName(), e);
@@ -507,18 +511,35 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public ResourceType getResourceTypeByName(String resourceTypeName) throws ConfigurationManagementException {
 
-        return getResourceTypeByIdentifier(resourceTypeName, null);
+        return getResourceTypeByIdentifier(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(),
+                resourceTypeName, null);
+    }
+
+    @Override
+    public ResourceType getResourceTypeByName(String tenantDomain, String resourceTypeName)
+            throws ConfigurationManagementException {
+
+        return getResourceTypeByIdentifier(tenantDomain, resourceTypeName, null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public ResourceType getResourceTypeById(String resourceTypeId) throws ConfigurationManagementException {
 
-        return getResourceTypeByIdentifier(null, resourceTypeId);
+        return getResourceTypeByIdentifier(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(),
+                null, resourceTypeId);
+    }
+
+    @Override
+    public ResourceType getResourceTypeById(String tenantDomain, String resourceTypeId)
+            throws ConfigurationManagementException {
+        return getResourceTypeByIdentifier(tenantDomain, null, resourceTypeId);
     }
 
     /**
@@ -527,10 +548,22 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
     @Override
     public void deleteResourceTypeByName(String resourceTypeName) throws ConfigurationManagementException {
 
+        deleteResourceTypeByName(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(),
+                resourceTypeName);
+    }
+
+    @Override
+    public void deleteResourceTypeByName(String tenantDomain, String resourceTypeName)
+            throws ConfigurationManagementException {
+
         JdbcTemplate jdbcTemplate = JdbcUtils.getNewTemplate();
         try {
             jdbcTemplate.executeUpdate(selectDeleteResourceTypeQuery(null), (
-                    preparedStatement -> preparedStatement.setString(1, resourceTypeName)
+                    preparedStatement -> {
+                        int index = 0;
+                        preparedStatement.setString(++index, resourceTypeName);
+                        preparedStatement.setInt(++index, IdentityTenantUtil.getTenantId(tenantDomain));
+                    }
             ));
         } catch (DataAccessException e) {
             throw handleServerException(ERROR_CODE_DELETE_RESOURCE_TYPE, resourceTypeName, e);
@@ -941,7 +974,8 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         return sb.toString();
     }
 
-    private ResourceType getResourceTypeByIdentifier(String name, String id) throws ConfigurationManagementException {
+    private ResourceType getResourceTypeByIdentifier(String tenantDomain, String name, String id)
+            throws ConfigurationManagementException {
 
         JdbcTemplate jdbcTemplate = JdbcUtils.getNewTemplate();
         ResourceType resourceTypeResponse;
@@ -953,9 +987,14 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
                         resourceType.setId(resultSet.getString(DB_SCHEMA_COLUMN_NAME_ID));
                         resourceType.setName(resultSet.getString(DB_SCHEMA_COLUMN_NAME_NAME));
                         resourceType.setDescription(resultSet.getString(DB_SCHEMA_COLUMN_NAME_DESCRIPTTION));
+                        resourceType.setTenantDomain(IdentityTenantUtil.getTenantDomain(resultSet.getInt(
+                                DB_SCHEMA_COLUMN_NAME_TENANT_ID)));
                         return resourceType;
-                    }, preparedStatement ->
-                            preparedStatement.setString(1, StringUtils.isEmpty(name) ? id : name)
+                    }, preparedStatement -> {
+                        int index = 0;
+                        preparedStatement.setString(++index, StringUtils.isEmpty(name) ? id : name);
+                        preparedStatement.setInt(++index, IdentityTenantUtil.getTenantId(tenantDomain));
+                    }
             );
             return resourceTypeResponse;
         } catch (DataAccessException e) {
@@ -1213,4 +1252,10 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
         }
     }
 
+    private int resolveTenantId(ResourceType resourceType) {
+
+        String tenantDomain = resourceType.getTenantDomain();
+        return StringUtils.isNotEmpty(tenantDomain) ? IdentityTenantUtil.getTenantId(tenantDomain) :
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+    }
 }

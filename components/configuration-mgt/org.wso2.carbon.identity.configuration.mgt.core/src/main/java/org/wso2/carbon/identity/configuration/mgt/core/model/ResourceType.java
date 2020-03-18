@@ -25,6 +25,8 @@ public class ResourceType {
     private String id;
     private String description;
 
+    private String tenantDomain;
+
     public ResourceType(String name, String id, String description) {
 
         this.name = name;
@@ -64,5 +66,13 @@ public class ResourceType {
     public void setDescription(String description) {
 
         this.description = description;
+    }
+
+    public String getTenantDomain() {
+        return tenantDomain;
+    }
+
+    public void setTenantDomain(String tenantDomain) {
+        this.tenantDomain = tenantDomain;
     }
 }
