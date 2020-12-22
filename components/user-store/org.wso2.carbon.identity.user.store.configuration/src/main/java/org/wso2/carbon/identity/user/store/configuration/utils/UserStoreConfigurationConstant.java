@@ -63,7 +63,9 @@ public class UserStoreConfigurationConstant {
                 "User store domain already exists with same domain name."),
         ERROR_CODE_USER_STORE_DOMAIN_NOT_FOUND("SUS-60001",
                 "Unable to find any user store's domain id with the provided identifier."),
-        ERROR_CODE_EMPTY_USERSTORE_DOMAIN_NAME("SUS-60008", "Userstore domain name cannot be emtpy.");
+        ERROR_CODE_EMPTY_USERSTORE_DOMAIN_NAME("SUS-60008", "Userstore domain name cannot be empty."),
+        ERROR_CODE_MISSING_MANDATORY_ATTRIBUTES_FOR_RDBMS_CONNECTIVITY_TEST_USING_MASKED_PASSWORD("SUS-60009",
+                "Domain name and message ID is mandatory when masked password is used.");
 
         private final String code;
         private final String message;

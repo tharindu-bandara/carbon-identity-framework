@@ -54,6 +54,7 @@ import static org.wso2.carbon.identity.user.store.configuration.utils.SecondaryU
 import static org.wso2.carbon.identity.user.store.configuration.utils.SecondaryUserStoreConfigurationUtil.triggerListenersOnUserStorePreAdd;
 import static org.wso2.carbon.identity.user.store.configuration.utils.SecondaryUserStoreConfigurationUtil.triggerListenersOnUserStorePreUpdate;
 import static org.wso2.carbon.identity.user.store.configuration.utils.SecondaryUserStoreConfigurationUtil.triggerListenersOnUserStoresPostGet;
+import static org.wso2.carbon.identity.user.store.configuration.utils.UserStoreConfigurationConstant.ErrorMessage.ERROR_CODE_MISSING_MANDATORY_ATTRIBUTES_FOR_RDBMS_CONNECTIVITY_TEST_USING_MASKED_PASSWORD;
 
 /**
  * Implementation class for UserStoreConfigService.
@@ -308,6 +309,8 @@ public class UserStoreConfigServiceImpl implements UserStoreConfigService {
                                        String connectionPassword, String messageID)
             throws IdentityUserStoreMgtException {
 
+        validateAttributesForConnectivityCheck(domainName, connectionPassword, messageID);
+
         if (StringUtils.isNotEmpty(messageID) && StringUtils.isNotEmpty(domainName)) {
             if (connectionPassword.equalsIgnoreCase(UserStoreConfigurationConstant.ENCRYPTED_PROPERTY_MASK)) {
                 Map<String, String> secondaryUserStoreProperties = SecondaryUserStoreConfigurationUtil
@@ -464,6 +467,22 @@ public class UserStoreConfigServiceImpl implements UserStoreConfigService {
             } catch (Exception e) {
                 throw new IdentityUserStoreMgtException(e.getMessage(), e);
             }
+        }
+    }
+
+    private void validateAttributesForConnectivityCheck(String domainName, String connectionPassword,
+                                                        String messageID)
+            throws IdentityUserStoreClientException {
+
+        if (connectionPassword.equalsIgnoreCase(UserStoreConfigurationConstant.ENCRYPTED_PROPERTY_MASK)
+                && (StringUtils.isBlank(domainName) || StringUtils.isBlank(messageID))) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Missing one or more mandatory attributes: domainName: %s, and message ID: " +
+                        "%s, for RDBMS connectivity check using the masked password", domainName, messageID));
+            }
+            UserStoreConfigurationConstant.ErrorMessage errorMessage =
+                    ERROR_CODE_MISSING_MANDATORY_ATTRIBUTES_FOR_RDBMS_CONNECTIVITY_TEST_USING_MASKED_PASSWORD;
+            throw new IdentityUserStoreClientException(errorMessage.getCode(), errorMessage.getMessage());
         }
     }
 }
