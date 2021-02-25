@@ -26,7 +26,9 @@ import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants;
 import org.wso2.carbon.identity.claim.metadata.mgt.util.SQLConstants;
 import org.wso2.carbon.identity.core.util.IdentityDatabaseUtil;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.UserCoreConstants;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -62,6 +64,17 @@ public class LocalClaimDAO extends ClaimDAO {
             for (Map.Entry<Integer, Claim> claimEntry : localClaimMap.entrySet()) {
                 int claimId = claimEntry.getKey();
                 Claim claim = claimEntry.getValue();
+
+                // Filter the local claim `role` when groups vs roles separation is enabled. This claim is considered
+                // as a legacy claim going forward, thus `roles` and `groups` claims should be used instead.
+                if (IdentityUtil.isGroupsVsRolesSeparationImprovementsEnabled() && UserCoreConstants.ROLE_CLAIM.equals(
+                        claim.getClaimURI())) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Skipping the legacy role claim: " + claim.getClaimURI() + ", when getting " +
+                                "local claims");
+                    }
+                    continue;
+                }
 
                 List<AttributeMapping> attributeMappingsOfClaim = claimAttributeMappingsOfDialect.get(claimId);
                 Map<String, String> propertiesOfClaim = claimPropertiesOfDialect.get(claimId);
