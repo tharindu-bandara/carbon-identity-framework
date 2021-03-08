@@ -2023,6 +2023,7 @@
 
         <!--Sonar Cloud Integration-->
         <sonar.projectKey>tharindu-bandara_carbon-identity-framework</sonar.projectKey>
+        <sonar.moduleKey>${artifactId}</sonar.moduleKey>
         <sonar.organization>tharindu-bandara</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
