@@ -487,7 +487,7 @@ public class DefaultClaimMetadataStore implements ClaimMetadataStore {
                     if (IdentityUtil.isGroupsVsRolesSeparationImprovementsEnabled() && UserCoreConstants.ROLE_CLAIM.
                             equals(localClaim.getClaimURI())) {
                         if (log.isDebugEnabled()) {
-                            log.debug("Skipping the legacy role claim: " + claim.getClaimURI() + ", when getting " +
+                            log.debug("Skipping the legacy role claim: " + localClaim.getClaimURI() + ", when getting " +
                                     "local claims");
                         }
                         continue;
